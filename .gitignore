@@ -1,5 +1,6 @@
 # Text backup files
 *.bak
 
-# Databases
-*.sqlite3
+# Databases and sqls
+# *.sqlite3
+*.sql
