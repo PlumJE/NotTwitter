@@ -1,0 +1,31 @@
+<EditScreen>
+    Image:
+        size_hint: 1, 1
+        source: root.bg_path
+        fit_mode: "fill"
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            size_hint_y: 0.1
+            Label:
+                id: writer
+                text: 'Writer : '
+                color: 'grey'
+            Label:
+                id: writedate
+                text: 'Write date : '
+                color: 'grey'
+        ScrollView:
+            size_hint_y: 0.8
+            do_scroll_x: False
+            do_scroll_y: True
+            TextInput:
+                id: content
+        BoxLayout:
+            size_hint_y: 0.1
+            Button:
+                text: 'Adjust'
+                on_release: root.adjust()
+            Button:
+                text: 'Discard'
+                on_release: root.discard()

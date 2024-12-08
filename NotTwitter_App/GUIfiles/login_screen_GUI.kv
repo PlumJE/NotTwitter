@@ -1,0 +1,90 @@
+<LoginWindow>
+    id: loginWin
+    cols: 2
+    size_hint: 1, 0.2
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 0.75
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    Label:
+        text: "Nickname :"
+        width: 100
+        color: "black"
+    TextInput:
+        id: nickname1
+    Label:
+        text: "Password :"
+        width: 100
+        color: "black"
+    TextInput:
+        id: password1
+    Button:
+        id: loginbtn
+        text: "Login"
+        on_release: root.login()
+    Button:
+        text: "Signup"
+        on_release: root.showSignupWin()
+
+<SignupWindow>
+    id: SignupWin
+    cols: 2
+    size_hint: 1, 0.3
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 0.75
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    Label:
+        text: "Input nickname:"
+        width: 100
+        color: "black"
+    TextInput:
+        id: nickname2
+    Label:
+        text: "Input mail address:"
+        width: 100
+        color: "black"
+    TextInput:
+        id: mailaddr
+    Label:
+        text: "Input password:"
+        width: 100
+        color: "black"
+    TextInput:
+        id: password2
+    Label:
+        text: "Input password again:"
+        width: 100
+        color: "black"
+    TextInput:
+        id: pswdagain
+    Button:
+        text: "To login window"
+        on_release: root.showLoginWin()
+    Button:
+        text: "Signup"
+        on_release: root.signup()
+
+<LoginScreen>
+    Image:
+        id: loginbg
+        fit_mode: "fill"
+        source: root.bg_path
+        on_touch_up: root.openLoginWin()
+    # Current Version Label!!
+    AnchorLayout:
+        anchor_x: 'right'
+        anchor_y: 'bottom'
+        Label:
+            size: 100, 30
+            size_hint: None, None
+            text: 'ver 0.1.2'
+            color: 'black'
+    AnchorLayout:
+        id: loginlayout
+        anchor_x: 'center'
+        anchor_y: 'center'

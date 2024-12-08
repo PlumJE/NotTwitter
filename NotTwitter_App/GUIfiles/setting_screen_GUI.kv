@@ -1,0 +1,61 @@
+<ChangeNickPopup>:
+    size_hint: 0.5, 0.2
+    title: "Change your nickname"
+    BoxLayout:
+        orientation: "vertical"
+        TextInput:
+            id: new_nick
+        BoxLayout:
+            Button:
+                text: 'Adjust'
+                on_release: root.adjust()
+            Button:
+                text: 'Discard'
+                on_release: root.discard()
+
+<SettingScreen>:
+    Image:
+        size_hint: 1, 1
+        source: root.bg_path
+        fit_mode: "fill"
+    ScrollView:
+        padding: 5, 5, 5, 5
+        do_scroll_x: False
+        do_scroll_y: True
+        AnchorLayout:
+            anchor_x: 'center'
+            anchor_y: 'center'
+            BoxLayout:
+                orientation: "vertical"
+                size_hint: 0.7, 0.2
+                canvas.before:
+                    Color:
+                        rgba: 1, 1, 1, 0.75
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                BoxLayout:
+                    Label:
+                        text: 'Nickname : '
+                        color: 'black'
+                    Label:
+                        id: nickname
+                        text: ''
+                        color: 'black'
+                    Button:
+                        text: 'Change'
+                        on_release: root.change_nick()
+                BoxLayout:
+                    Label:
+                        text: 'Usernum : '
+                        color: 'black'
+                    Label:
+                        id: usernum
+                        text: ''
+                        color: 'black'
+                    Button:
+                        text: 'Logout'
+                        on_release: root.logout()
+                Button:
+                    text: 'Exit'
+                    on_release: root.exit()
