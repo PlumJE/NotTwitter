@@ -1,6 +1,6 @@
 <LoginWindow>
     id: loginWin
-    cols: 2
+    orientation: "vertical"
     size_hint: 1, 0.2
     canvas.before:
         Color:
@@ -8,25 +8,30 @@
         Rectangle:
             pos: self.pos
             size: self.size
-    Label:
-        text: "Nickname :"
-        width: 100
-        color: "black"
-    TextInput:
-        id: nickname1
-    Label:
-        text: "Password :"
-        width: 100
-        color: "black"
-    TextInput:
-        id: password1
+    GridLayout:
+        cols: 2
+        Label:
+            text: "Nickname :"
+            width: 100
+            color: "black"
+        TextInput:
+            id: nickname1
+        Label:
+            text: "Password :"
+            width: 100
+            color: "black"
+        TextInput:
+            id: password1
     Button:
         id: loginbtn
         text: "Login"
         on_release: root.login()
-    Button:
-        text: "Signup"
-        on_release: root.showSignupWin()
+
+<RegisterPopup>
+    title: "Hello"
+    content:
+        Label: 
+            text: "You pressed the button"
 
 <SignupWindow>
     id: SignupWin

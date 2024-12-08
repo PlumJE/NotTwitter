@@ -1,7 +1,7 @@
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
+from requests import post, get, put, delete
 from requests.exceptions import *
-import requests
 
 from debug import logger
 
@@ -14,6 +14,16 @@ class ResponseException(RequestException):
     def __str__(self):
         return '{} : {}'.format(self.code, self.message)
     def make_error_popup(self, title, content=None, size_hint=(1, 0.2), auto_dismiss=True, *args):
+        if content == None:
+            content = str(self)
+        return Popup(
+            title=title,
+            content=Label(text=content),
+            size_hint=size_hint,
+            auto_dismiss=auto_dismiss,
+            *args
+        )
+    def make_confirm_popup(self, title, content=None, size_hint=(1, 0.2), auto_dismiss=True, *args):
         if content == None:
             content = str(self)
         return Popup(
@@ -61,7 +71,13 @@ class UsersDBInterface(DBInterface):
         self._url += 'users/'
         self._token = ''
         self._usernum = 0
-    # 성공시 None, 실패시 Popup을 리턴
+    # http 헤더를 생성
+    def get_header(self):
+        return {
+            'Authorization': 'Token ' + self._token,
+            'usernum': str(self._usernum)
+        }
+    # 처음오면 false, 온 적이 있으면 true, 실패시 ResponseException을 리턴
     def login(self, nickname, password):
         url = self._url + 'loginout/'
         data = {
@@ -72,7 +88,7 @@ class UsersDBInterface(DBInterface):
         response = self._post(url, data=data)
 
         if type(response) == ResponseException:
-            return response.make_error_popup('Login failed')
+            return response
         
         self._token = response.get('token')
         self._usernum = response.get('usernum')
@@ -89,33 +105,26 @@ class UsersDBInterface(DBInterface):
         self._token = ''
         self._usernum = 0
     # 성공시 None, 실패시 Popup을 리턴
-    def signup(self, nickname, mailaddr, password):
-        url = self._url + 'signupdown/'
+    def register(self, nickname, mailaddr, password, firstname, lastname):
+        url = self._url + 'userinfo/'
         data = {
             'nickname': nickname,
+            'password': password,
             'mailaddr': mailaddr,
-            'password': password
+            'firstname': firstname,
+            'lastname': lastname
         }
 
         response = self._post(url, data=data)
 
         if type(response) == ResponseException:
-            return response.make_error_popup('Signup failed')
-    # 성공시 None, 실패시 Popup을 리턴
-    def signdown(self):
-        url = self._url + 'signupdown/'
-        headers = self.get_header()
-        
-        response = self._delete(url, headers=headers)
-
-        if type(response) == ResponseException:
-            return response.make_error_popup('Signdown failed')
+            return response.make_error_popup('Register failed')
     # 성공시 유저명, 실패시 Popup을 리턴
-    def get_nickname(self, usernum=None):
+    def get_userinfo(self, usernum=None):
         if usernum == None:
             usernum = self._usernum
 
-        url = self._url + 'nickname/'
+        url = self._url + 'userinfo/'
         headers = self.get_header()
         data = {
             'usernum': usernum
@@ -128,23 +137,20 @@ class UsersDBInterface(DBInterface):
         
         return response.get('nickname')
     # 성공시 None, 실패시 Popup을 리턴
-    def put_nickname(self, nickname):
-        url = self._url + 'nickname/'
+    def put_userinfo(self, nickname, mailaddr, firstname, lastname):
+        url = self._url + 'userinfo/'
         headers = self.get_header()
         data = {
-            'nickname': nickname
+            'nickname': nickname,
+            'mailaddr': mailaddr,
+            'firstname': firstname,
+            'lastname': lastname
         }
 
         response = self._put(url, headers=headers, data=data)
 
         if type(response) == ResponseException:
             return response.make_error_popup('Cannot save username')
-    # http 헤더를 생성
-    def get_header(self):
-        return {
-            'Authorization': 'Token ' + self._token,
-            'usernum': str(self._usernum)
-        }
 usersdbinterface = UsersDBInterface()
 
 # 포스트 관리 인터페이스 클래스
@@ -154,11 +160,13 @@ class PostsDBInterface(DBInterface):
         self._url += 'posts/'
         self._id_prefix = ''
     # 성공시 리스트, 실패시 Popup을 리턴
-    def get_postlist(self):
+    def get_postlist(self, where="", order=""):
         url = self._url + 'postlist/'
         headers = usersdbinterface.get_header()
         data = {
-            'id_prefix': self._id_prefix
+            'id_prefix': self._id_prefix,
+            'where': where,
+            'order': order
         }
 
         response = self._get(url, headers=headers, data=data)
@@ -192,7 +200,7 @@ class PostsDBInterface(DBInterface):
         headers = usersdbinterface.get_header()
         data = {
             'id_prefix': self._id_prefix,
-            'writer': usersdbinterface.get_header().get('usernum'),
+            'writer': headers.get('usernum'),
             'writedate': writedate,
             'content': content
         }

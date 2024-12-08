@@ -59,7 +59,7 @@ class PostScreen(Screen):
     bg_path = graphics_folder + '/post_background.jpg'
     # 게시글 스크린으로 들어가기 직전의 행동이다
     def on_pre_enter(self, *args):
-        nickname = usersdbinterface.get_nickname()
+        nickname = usersdbinterface.get_userinfo()
         if type(nickname) == Popup:
             nickname.open()
             self.goto_login_screen()
@@ -98,7 +98,7 @@ Post carefully!"""))
             id = result.get('id')
             writer = result.get('writer')
             print('writer is', writer)
-            writer = usersdbinterface.get_nickname(writer)
+            writer = usersdbinterface.get_userinfo(writer)
             if type(writer) == Popup:
                 writer.open()
                 self.goto_login_screen()

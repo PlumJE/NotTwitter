@@ -17,8 +17,8 @@ class ChangeNickPopup(Popup):
     # 닉네임을 검토한 뒤 변경을 승인한다
     def adjust(self, *args):
         new_nick = self.ids.new_nick.text
-        usersdbinterface.put_nickname(new_nick)
-        settingscreen.update_nickname()
+        usersdbinterface.put_userinfo(new_nick)
+        settingscreen.update_userinfo()
         logger.info('Changing nickname succeed!')
         self.dismiss()
     # 닉네임 변경을 포기한다
@@ -30,14 +30,14 @@ class SettingScreen(Screen):
     bg_path = graphics_folder + '/post_background.jpg'
     # 환경설정 스크린으로 들어가기 직전의 행동이다
     def on_pre_enter(self, *args):
-        self.ids.nickname.text = usersdbinterface.get_nickname()
+        self.ids.nickname.text = usersdbinterface.get_userinfo()
         self.ids.usernum.text = usersdbinterface.get_header().get('usernum')
     # 닉네임 변경하는 팝업창을 띄운다
     def change_nick(self, *args):
         ChangeNickPopup(self.ids.nickname.text).open()
     # 닉네임을 갱신한다
-    def update_nickname(self):
-        self.ids.nickname.text = usersdbinterface.get_nickname()
+    def update_userinfo(self):
+        self.ids.nickname.text = usersdbinterface.get_userinfo()
     # 로그아웃 한다
     def logout(self, *args):
         usersdbinterface.logout()

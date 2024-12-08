@@ -2,8 +2,10 @@ from re import compile
 from kivy.lang import Builder
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.screenmanager import Screen
+from requests import RequestException
 
 from db_interface import usersdbinterface
 from folder_paths import GUI_folder, graphics_folder
@@ -12,20 +14,28 @@ from folder_paths import GUI_folder, graphics_folder
 Builder.load_file(GUI_folder + '/login_screen_GUI.kv')
 
 # 로그인 입력창 클래스
-class LoginWindow(GridLayout):
+class LoginWindow(BoxLayout):
     # 입력한 문자열이 유효한지 확인한 후에 로그인을 시도한다
     def login(self, *args):
         nickname = self.ids.nickname1.text
         password = self.ids.password1.text
         result = usersdbinterface.login(nickname, password)
-        if type(result) == Popup:
-            result.open()
+        if issubclass(type(result), RequestException):
+            if result.code == 401:
+                RegisterReqPopup().open()
+            else:
+                result.make_error_popup().open()
             return
         loginscreen.goto_post_screen()
-    # 회원가입 창으로 변경한다
-    def showSignupWin(self, *args):
-        loginscreen.showSignupWin(*args)
+    # # 회원가입 창으로 변경한다
+    # def showSignupWin(self, *args):
+    #     loginscreen.showSignupWin(*args)
 loginwin = LoginWindow()
+
+# 회원가입 권유 팝업
+class RegisterReqPopup(Popup):
+    pass
+
 
 # 회원가입 입력창 클래스
 class SignupWindow(GridLayout):
@@ -96,24 +106,24 @@ class LoginScreen(Screen):
     # state가 0이면 아무런 창도 없고, 1이면 로그인 창만, 2이면 회원가입 창만 있는 상태
     state = 0
     bg_path = graphics_folder + '/login_background.jpg'
-    # 로그인 창을 열기만 한다
+    # 로그인 창을 연다
     def openLoginWin(self, *args):
         if self.state == 0:
             self.showLoginWin(args)
-    # 로그인 창을 열고, 회원가입 창을 닫는다
-    def showLoginWin(self, *args):
-        if self.state != 1:
-            self.ids.loginlayout.add_widget(loginwin)
-        if self.state == 2:
-            self.ids.loginlayout.remove_widget(signupwin)
-        self.state = 1
-    # 회원가입 창을 열고, 로그인 창을 닫는다
-    def showSignupWin(self, *args):
-        if self.state != 2:
-            self.ids.loginlayout.add_widget(signupwin)
-        if self.state == 1:
-            self.ids.loginlayout.remove_widget(loginwin)
-        self.state = 2
+    # # 로그인 창을 열고, 회원가입 창을 닫는다
+    # def showLoginWin(self, *args):
+    #     if self.state != 1:
+    #         self.ids.loginlayout.add_widget(loginwin)
+    #     if self.state == 2:
+    #         self.ids.loginlayout.remove_widget(signupwin)
+    #     self.state = 1
+    # # 회원가입 창을 열고, 로그인 창을 닫는다
+    # def showSignupWin(self, *args):
+    #     if self.state != 2:
+    #         self.ids.loginlayout.add_widget(signupwin)
+    #     if self.state == 1:
+    #         self.ids.loginlayout.remove_widget(loginwin)
+    #     self.state = 2
     # 게시글 스크린으로 들어간다
     def goto_post_screen(self):
         self.manager.current = "Post Screen"

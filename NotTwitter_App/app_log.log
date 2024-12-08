@@ -1,15 +1,13 @@
-Leathal error has occurred!! 
+Leathal error has occurred!! 'UsersDBInterface' object has no attribute 'get_nickname'
 Search log is : ['', '0']
+Search log is : ['', '0/0']
 Search log is : ['', '0']
 Search log is : ['', '0', '0/0']
+Leathal error has occurred!! PostsDBInterface.get_postlist() missing 2 required positional arguments: 'condition' and 'order'
 Search log is : ['', '0']
-Leathal error has occurred!! 
-Leathal error has occurred!! 
-Leathal error has occurred!! 
+Search log is : ['', '0/0']
 Search log is : ['', '0']
-Changing nickname succeed!
-Changing nickname succeed!
-Changing nickname succeed!
-Changing nickname succeed!
+Search log is : ['', '0']
+Search log is : ['', '0/0']
 Search log is : ['', '0']
 Search log is : ['', '0', '0/0']
