@@ -30,7 +30,7 @@ class SettingScreen(Screen):
     bg_path = graphics_folder + '/post_background.jpg'
     # 환경설정 스크린으로 들어가기 직전의 행동이다
     def on_pre_enter(self, *args):
-        self.ids.nickname.text = usersdbinterface.get_userinfo()
+        self.ids.nickname.text = usersdbinterface.get_userinfo().get('nickname')
         self.ids.usernum.text = usersdbinterface.get_header().get('usernum')
     # 닉네임 변경하는 팝업창을 띄운다
     def change_nick(self, *args):

@@ -1,10 +1,9 @@
 from datetime import datetime
 from kivy.lang.builder import Builder
-from kivy.uix.label import Label
-from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import Screen
 
-from db_interface import usersdbinterface, postsdbinterface
+from custom_popup import ErrorPopup
+from db_interface import ResponseException, usersdbinterface, postsdbinterface
 from folder_paths import GUI_folder, graphics_folder
 
 
@@ -17,12 +16,12 @@ class EditScreen(Screen):
     writedate = ''
     # 게시글 작성 스크린으로 들어가기 직전의 행동이다. 작성자id, 작성자 닉네임, 현재 날짜를 얻어내, 작성자 닉네임, 현재 날짜를 스크린에 띄운다
     def on_pre_enter(self, *args):
-        writer = usersdbinterface.get_nickname()
-        if type(writer) == Popup:
-            writer.open()
+        userinfo = usersdbinterface.get_userinfo()
+        if type(userinfo) == ResponseException:
+            ErrorPopup('Adjust error!', str(userinfo)).open()
             self.goto_post_screen()
             return
-        self.writer = writer
+        self.writer = userinfo.get('nickname')
         self.writedate = str(datetime.now().date())
         self.ids.writer.text = 'Writer : ' + self.writer
         self.ids.writedate.text = 'Write date : ' + self.writedate
@@ -31,16 +30,10 @@ class EditScreen(Screen):
     def adjust(self, *args):
         content = self.ids.content.text
         if content == '' or content.isspace():
-            Popup(
-                title='Adjust error!', 
-                content=Label('Pls enter any non-blank letter!'), 
-                size_hint=(1, 0.2), 
-                auto_dismiss=True
-            ).open()
             return
         result = postsdbinterface.post_post(self.writedate, content)
-        if type(result) == Popup:
-            result.open()
+        if type(result) == ResponseException:
+            ErrorPopup('Adjust error!', str(result)).open()
             return
         editscreen.goto_post_screen()
     # 게시글 작성을 포기한다

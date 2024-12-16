@@ -4,7 +4,8 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.screenmanager import Screen
 from kivy.uix.behaviors import ButtonBehavior
 
-from db_interface import usersdbinterface, postsdbinterface
+from custom_popup import ErrorPopup
+from db_interface import ResponseException, usersdbinterface, postsdbinterface
 from folder_paths import GUI_folder, graphics_folder
 from debug import logger
 
@@ -59,11 +60,12 @@ class PostScreen(Screen):
     bg_path = graphics_folder + '/post_background.jpg'
     # 게시글 스크린으로 들어가기 직전의 행동이다
     def on_pre_enter(self, *args):
-        nickname = usersdbinterface.get_userinfo()
-        if type(nickname) == Popup:
-            nickname.open()
+        userinfo = usersdbinterface.get_userinfo()
+        if type(userinfo) == ResponseException:
+            ErrorPopup('Adjust error!', str(userinfo)).open()
             self.goto_login_screen()
             return
+        nickname = userinfo.get('nickname')
         self.ids.welcome_message.text = 'Welcome, ' + nickname + '!'
         self.updateposts()
     # 부모가 되는 게시글과 그것의 자식 게시글들을 소환한다
@@ -85,24 +87,25 @@ cause it is no use crying over spilt milk.
 Post carefully!"""))
         # 부모와 자식 게시들을의 id를 소환해, 이들을 통해 화면에 게시글들을 표시한다
         postlist = postsdbinterface.get_postlist()
-        if type(postlist) == Popup:
-            postlist.open()
+        if type(postlist) == ResponseException:
+            ErrorPopup('Adjust error!', str(postlist)).open()
             self.goto_login_screen()
             return
         for post in postlist:
             result = postsdbinterface.get_post(post)
-            if type(result) == Popup:
-                result.open()
+            if type(result) == ResponseException:
+                ErrorPopup('Adjust error!', str(result)).open()
                 self.goto_login_screen()
                 return
             id = result.get('id')
             writer = result.get('writer')
             print('writer is', writer)
-            writer = usersdbinterface.get_userinfo(writer)
-            if type(writer) == Popup:
-                writer.open()
+            userinfo = usersdbinterface.get_userinfo(writer)
+            if type(userinfo) == ResponseException:
+                ErrorPopup('Adjust error!', str(userinfo)).open()
                 self.goto_login_screen()
                 return
+            writer = userinfo.get('nickname')
             writedate = result.get('writedate')
             content = result.get('content')
             self.ids.body.add_widget(PostUnit(id, writer, writedate, content))

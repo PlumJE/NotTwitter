@@ -9,6 +9,7 @@
             pos: self.pos
             size: self.size
     GridLayout:
+        size_hint_y: 2
         cols: 2
         Label:
             text: "Nickname :"
@@ -24,55 +25,9 @@
             id: password1
     Button:
         id: loginbtn
-        text: "Login"
+        text: "Login!"
+        size_hint_y: 1
         on_release: root.login()
-
-<RegisterPopup>
-    title: "Hello"
-    content:
-        Label: 
-            text: "You pressed the button"
-
-<SignupWindow>
-    id: SignupWin
-    cols: 2
-    size_hint: 1, 0.3
-    canvas.before:
-        Color:
-            rgba: 1, 1, 1, 0.75
-        Rectangle:
-            pos: self.pos
-            size: self.size
-    Label:
-        text: "Input nickname:"
-        width: 100
-        color: "black"
-    TextInput:
-        id: nickname2
-    Label:
-        text: "Input mail address:"
-        width: 100
-        color: "black"
-    TextInput:
-        id: mailaddr
-    Label:
-        text: "Input password:"
-        width: 100
-        color: "black"
-    TextInput:
-        id: password2
-    Label:
-        text: "Input password again:"
-        width: 100
-        color: "black"
-    TextInput:
-        id: pswdagain
-    Button:
-        text: "To login window"
-        on_release: root.showLoginWin()
-    Button:
-        text: "Signup"
-        on_release: root.signup()
 
 <LoginScreen>
     Image:
