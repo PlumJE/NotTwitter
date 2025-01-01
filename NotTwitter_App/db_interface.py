@@ -70,7 +70,7 @@ class UsersDBInterface(DBInterface):
         
         self._token = response.get('token')
         self._usernum = response.get('usernum')
-    # 성공시 None, 실패시 Popup을 리턴
+    # 성공시 None, 실패시 ResponseException을 리턴
     def logout(self):
         url = self._url + 'loginout/'
         headers = self.get_header()
@@ -78,12 +78,12 @@ class UsersDBInterface(DBInterface):
         response = self._delete(url, headers=headers)
 
         if type(response) == ResponseException:
-            return response.make_error_popup('Logout failed')
+            return response
 
         self._token = ''
         self._usernum = 0
-    # 성공시 None, 실패시 Popup을 리턴
-    def register(self, nickname, mailaddr, password, firstname, lastname):
+    # 성공시 None, 실패시 ResponseException을 리턴
+    def post_userinfo(self, nickname, mailaddr, password, firstname, lastname):
         url = self._url + 'userinfo/'
         data = {
             'nickname': nickname,
@@ -96,25 +96,22 @@ class UsersDBInterface(DBInterface):
         response = self._post(url, data=data)
 
         if type(response) == ResponseException:
-            return response.make_error_popup('Register failed')
-    # 성공시 유저정보, 실패시 Popup을 리턴
+            return response
+    # 성공시 유저정보, 실패시 ResponseException을 리턴
     def get_userinfo(self, usernum=None):
-        if usernum == None:
-            usernum = self._usernum
-
         url = self._url + 'userinfo/'
         headers = self.get_header()
         data = {
-            'usernum': usernum
+            'usernum': usernum if usernum else self._usernum
         }
 
         response = self._get(url, headers=headers, data=data)
 
         if type(response) == ResponseException:
-            return response.make_error_popup('Cannot load username')
+            return response
         
         return response
-    # 성공시 None, 실패시 Popup을 리턴
+    # 성공시 None, 실패시 ResponseException을 리턴
     def put_userinfo(self, nickname, mailaddr, firstname, lastname):
         url = self._url + 'userinfo/'
         headers = self.get_header()
@@ -128,8 +125,75 @@ class UsersDBInterface(DBInterface):
         response = self._put(url, headers=headers, data=data)
 
         if type(response) == ResponseException:
-            return response.make_error_popup('Cannot save username')
+            return response
 usersdbinterface = UsersDBInterface()
+
+# 유저 상세정보 관리 인터페이스 클래스
+class UserDetailsDBInterface(DBInterface):
+    def __init__(self):
+        super(UserDetailsDBInterface, self).__init__()
+        self._url += 'users/'
+        # 성공시 None, 실패시 Popup을 리턴
+    # 성공시 None, 실패시 ResponseException을 리턴
+    def post_userinfo(self, birth, phone, families, nation, legion, job, jobaddr):
+        url = self._url + 'userinfo/'
+        data = {
+            'birth': birth,
+            'phone': phone,
+            'families': families,
+            'nation': nation,
+            'legion': legion,
+            'job': job,
+            'jobaddr': jobaddr
+        }
+
+        response = self._post(url, data=data)
+
+        if type(response) == ResponseException:
+            return response
+    # 성공시 유저정보, 실패시 ResponseException을 리턴
+    def get_userinfo(self, usernum=None):
+        url = self._url + 'userdetail/'
+        headers = usersdbinterface.get_header()
+        data = {
+            'usernum': usernum if usernum else int(headers.get('usernum'))
+        }
+
+        response = self._get(url, headers=headers, data=data)
+
+        if type(response) == ResponseException:
+            return response
+        
+        return response
+    # 성공시 None, 실패시 ResponseException을 리턴
+    def put_userinfo(self, birth, phone, families, nation, legion, job, jobaddr):
+        url = self._url + 'userinfo/'
+        headers = usersdbinterface.get_header()
+        data = {
+            'birth': birth,
+            'phone': phone,
+            'families': families,
+            'nation': nation,
+            'legion': legion,
+            'job': job,
+            'jobaddr': jobaddr
+        }
+
+        response = self._put(url, headers=headers, data=data)
+
+        if type(response) == ResponseException:
+            return response
+    # 성공시 None, 실패시 ResponseException을 리턴
+    def delete_userinfo(self):
+        url = self._url + 'userinfo/'
+        headers = usersdbinterface.get_header()
+        data = {}
+
+        response = self._put(url, headers=headers, data=data)
+
+        if type(response) == ResponseException:
+            return response
+userdetaildbinterface = UserDetailsDBInterface()
 
 # 포스트 관리 인터페이스 클래스
 class PostsDBInterface(DBInterface):
@@ -137,8 +201,8 @@ class PostsDBInterface(DBInterface):
         super(PostsDBInterface, self).__init__()
         self._url += 'posts/'
         self._id_prefix = ''
-    # 성공시 리스트, 실패시 Popup을 리턴
-    def get_postlist(self, where="", order=""):
+    # 성공시 리스트, 실패시 ResponseException을 리턴
+    def get_postlist(self, where='', order=''):
         url = self._url + 'postlist/'
         headers = usersdbinterface.get_header()
         data = {
@@ -153,10 +217,10 @@ class PostsDBInterface(DBInterface):
             if response.code == 404:
                 return []
             else:
-                return response.make_error_popup('Loading post list failed')
+                return response
 
         return response.get('id_list')
-    # 성공시 {...}, 실패시 Popup을 리턴
+    # 성공시 {...}, 실패시 ResponseException을 리턴
     def get_post(self, id):
         url = self._url + 'post/'
         headers = usersdbinterface.get_header()
@@ -169,10 +233,10 @@ class PostsDBInterface(DBInterface):
             if response.status_code == 404:
                 return {}
             else:
-                return response.make_error_popup('Loading post failed')
+                return response
         
         return response
-    # 성공시 None, 실패시 Popup을 리턴
+    # 성공시 None, 실패시 ResponseException을 리턴
     def post_post(self, writedate, content):
         url = self._url + 'post/'
         headers = usersdbinterface.get_header()
@@ -185,7 +249,7 @@ class PostsDBInterface(DBInterface):
 
         response = self._post(url, headers=headers, data=data)
         if type(response) == ResponseException:
-            return response.make_error_popup('Saving post failed')
+            return response
     # 현재 id_prefix를 읽음
     def get_id_prefix(self):
         return self._id_prefix

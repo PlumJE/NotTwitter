@@ -1,5 +1,4 @@
 from kivy.lang import Builder
-from kivy.uix.popup import Popup
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.screenmanager import Screen
 from kivy.uix.behaviors import ButtonBehavior
@@ -69,14 +68,15 @@ class PostScreen(Screen):
         self.ids.welcome_message.text = 'Welcome, ' + nickname + '!'
         self.updateposts()
     # 부모가 되는 게시글과 그것의 자식 게시글들을 소환한다
-    def updateposts(self, id_prefix=None):
+    def updateposts(self, id_prefix=None, where='', order=''):
         # 초기화 과정
         if self.ids.body.children != []:
             self.ids.body.clear_widgets()
-        # id_prefix를 변경하거나 불러온다
-        if id_prefix != None:
+        # id_prefix에 값이 전달되지 않으면 기존값을 유지하고, 값이 전달되면 값을 바꾼다. 
+        if id_prefix == None:
+            id_prefix = postsdbinterface.get_id_prefix()
+        else:
             postsdbinterface.put_id_prefix(id_prefix)
-        id_prefix = postsdbinterface.get_id_prefix()
         # parent가 ''이면 공지사항 게시글을 맨 위에 추가한다
         if (id_prefix == ''):
             self.ids.body.add_widget(PostUnit('', 'NotTwitter', '2000-00-00', 
@@ -86,7 +86,7 @@ but this app cannot edit or delete your post,
 cause it is no use crying over spilt milk.
 Post carefully!"""))
         # 부모와 자식 게시들을의 id를 소환해, 이들을 통해 화면에 게시글들을 표시한다
-        postlist = postsdbinterface.get_postlist()
+        postlist = postsdbinterface.get_postlist(where, order)
         if type(postlist) == ResponseException:
             ErrorPopup('Adjust error!', str(postlist)).open()
             self.goto_login_screen()
@@ -129,6 +129,9 @@ Post carefully!"""))
     # 게시글 작성 스크린으로 들어간다
     def goto_edit_screen(self):
         self.manager.current = 'Edit Screen'
+    # 프로필 스크린으로 들어간다
+    def goto_profile_screen(self):
+        self.manager.current = 'Profile Screen'
     # 환경설정 스크린으로 들어간다
     def goto_setting_screen(self):
         self.manager.current = 'Setting Screen'

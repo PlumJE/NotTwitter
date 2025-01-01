@@ -12,6 +12,7 @@ from kivy.uix.screenmanager import ScreenManager
 from login_screen import loginscreen
 from post_screen import postscreen
 from edit_screen import editscreen
+from profile_screen import profilescreen
 from setting_screen import settingscreen
 from debug import logger
 
@@ -25,6 +26,7 @@ class NotTwitterApp(App):
         self.screen_manager.add_widget(loginscreen)
         self.screen_manager.add_widget(postscreen)
         self.screen_manager.add_widget(editscreen)
+        self.screen_manager.add_widget(profilescreen)
         self.screen_manager.add_widget(settingscreen)
         return self.screen_manager
 
@@ -32,4 +34,4 @@ if __name__ == "__main__":
     try:
         NotTwitterApp().run()
     except Exception as e:
-        logger.critical('Leathal error has occurred!! ' + str(e))
+        logger.critical('Leathal error has occurred!! : ' + str(e))

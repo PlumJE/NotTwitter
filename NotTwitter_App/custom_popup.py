@@ -15,10 +15,8 @@ class SelectPopup(Popup):
     def __init__(self, title, content, yesText, noText, yesFunc=None, noFunc=None, **kwargs):
         super().__init__(**kwargs)
 
-        if yesFunc == None:
-            yesFunc = lambda x: None
-        if noFunc == None:
-            noFunc = self.dismiss
+        yesFunc = self.click_template(yesFunc)
+        noFunc = self.click_template(noFunc)
 
         innerLayout1 = BoxLayout()
         innerLayout1.add_widget(Label(text=content))
@@ -35,3 +33,9 @@ class SelectPopup(Popup):
         self.content=contentLayout
         self.size_hint=(1, 0.2)
         self.auto_dismiss=True
+    def click_template(self, func):
+        def template(*args):
+            if func != None:
+                func(*args)
+            self.dismiss()
+        return template

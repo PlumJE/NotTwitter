@@ -12,21 +12,27 @@ class PostlistView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     def get(self, request):
         try:
-            id_prefix = request.data.get('id_prefix', '')
-            posts = Posts.objects.filter(id__startswith=id_prefix)
+            rawsql = "SELECT id FROM posts_posts"
+
+            id_prefix = request.data.get('id_prefix')
+            if id_prefix:
+                rawsql += " where id regexp '^" + id_prefix + "(/[0-9]+)?$' "
+            else:
+                rawsql += " where id regexp '^[0-9]+$' "
+            
             where = request.data.get('where')
             if where:
-                posts = posts.filter(id=RawSQL("SELECT id FROM auth_user WHERE %s", where))
+                rawsql += " and " + where
             order = request.data.get('order')
             if order:
-                posts = posts.filter(id=RawSQL("SELECT id FROM auth_user WHERE %s ORDER BY %s", where, order))
-            
-            posts = posts.values_list('id', flat=True)
-            if not posts.exists():
+                rawsql += " order by " + order
+
+            posts = [post.id for post in Posts.objects.raw(rawsql)]
+            if posts == []:
                 raise NotFound('No posts found with the given prefix')
-            
+
             return Response(
-                {'id_list': list(posts)},
+                {'id_list': posts},
                 status=status.HTTP_200_OK
             )
         except APIException as e:
@@ -42,7 +48,7 @@ class PostlistView(APIView):
 
 class PostView(APIView):
     permission_classes = [permissions.IsAuthenticated]
-    def generate_new_id(id_prefix):
+    def generate_new_id(self, id_prefix):
         new_id_suffix = Posts.objects.filter(id__startswith=id_prefix).count()
 
         if id_prefix:
@@ -77,11 +83,16 @@ class PostView(APIView):
             writer = request.data.get('writer')
             writedate = request.data.get('writedate')
             content = request.data.get('content')
-            id_prefix = request.data.get('id_prefix', '')
+            id_prefix = request.data.get('id_prefix')
 
             new_id = self.generate_new_id(id_prefix)
 
-            Posts.objects.create(id=new_id, writer=writer, writedate=writedate, content=content)
+            Posts.objects.create(
+                id=new_id, 
+                writer=writer, 
+                writedate=writedate, 
+                content=content
+            )
 
             return Response(
                 {'id': new_id},

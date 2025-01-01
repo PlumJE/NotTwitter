@@ -36,17 +36,6 @@
                         size: self.size
                 BoxLayout:
                     Label:
-                        text: 'Nickname : '
-                        color: 'black'
-                    Label:
-                        id: nickname
-                        text: ''
-                        color: 'black'
-                    Button:
-                        text: 'Change'
-                        on_release: root.change_nick()
-                BoxLayout:
-                    Label:
                         text: 'Usernum : '
                         color: 'black'
                     Label:
@@ -58,4 +47,4 @@
                         on_release: root.logout()
                 Button:
                     text: 'Exit'
-                    on_release: root.exit()
+                    on_release: root.goto_post_screen()

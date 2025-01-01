@@ -1,0 +1,10 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "lje",
+            "database": "${workspaceFolder:NotTwitter}/NotTwitter_Server/db.sqlite3"
+        }
+    ]
+}

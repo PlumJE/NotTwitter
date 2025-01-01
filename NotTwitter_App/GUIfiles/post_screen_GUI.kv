@@ -62,9 +62,17 @@
                 text: ''
                 color: 'black'
             Button:
+                id: search_btn
+                text: 'Search'
+                on_release: None
+            Button:
                 id: home_btn
                 text: 'Go Home'
                 on_release: root.updateposts('')
+            Button:
+                id: profile_btn
+                text: 'Profile'
+                on_release: root.goto_profile_screen()
             Button:
                 id: settings_btn
                 text: 'Settings'

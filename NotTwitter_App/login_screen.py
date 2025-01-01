@@ -2,6 +2,7 @@ from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.screenmanager import Screen
 
+from profile_screen import profilescreen
 from custom_popup import ErrorPopup, SelectPopup
 from db_interface import ResponseException, usersdbinterface
 from folder_paths import GUI_folder, graphics_folder
@@ -20,7 +21,12 @@ class LoginWindow(BoxLayout):
         result = usersdbinterface.login(nickname, password)
         if type(result) == ResponseException:
             if result.code == 401:
-                SelectPopup('', 'Would you like to Sign up as a new account?', 'yes', 'no').open()
+                SelectPopup('First time seeing this account', 
+                            'Would you like to sign up as a new account?', 
+                            'yes', 
+                            'no',
+                            lambda x: loginscreen.goto_profile_screen()
+                ).open()
             else:
                 ErrorPopup('Login error!', str(result)).open()
             return
@@ -104,4 +110,8 @@ class LoginScreen(Screen):
     # 게시글 스크린으로 들어간다
     def goto_post_screen(self):
         self.manager.current = "Post Screen"
+    # 프로필 스크린으로 들어간다(회원가입용)
+    def goto_profile_screen(self, *args):
+        profilescreen.activate_register_mode()
+        self.manager.current = 'Profile Screen'
 loginscreen = LoginScreen(name="Login Screen")
