@@ -2,6 +2,7 @@ from kivy.uix.popup import Popup
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.textinput import TextInput
 
 class ErrorPopup(Popup):
     def __init__(self, title, content, **kwargs):
@@ -39,3 +40,18 @@ class SelectPopup(Popup):
                 func(*args)
             self.dismiss()
         return template
+    
+class InsertPopup(Popup):
+    _value = None
+    _textInput = TextInput()
+    def __init__(self, title, **kwargs):
+        super().__init__(**kwargs)
+
+        contentLayout = BoxLayout(orientation='vertical')
+        contentLayout.add_widget(self._textInput)
+        contentLayout.add_widget(Button(text='Input!', on_release=self._setValue))
+
+        self.title=title
+        self.content=contentLayout
+        self.size_hint=(1, 0.2)
+        self.auto_dismiss=True

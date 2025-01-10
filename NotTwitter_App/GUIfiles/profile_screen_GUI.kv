@@ -39,6 +39,16 @@
                         color: 'black'
                         readonly: True
                 BoxLayout:
+                    id: mailaddrlayout
+                    Label:
+                        text: 'Email address : '
+                        color: 'black'
+                    TextInput:
+                        id: mailaddr
+                        text: ''
+                        color: 'black'
+                        readonly: True
+                BoxLayout:
                     Label:
                         text: 'First name : '
                         color: 'black'
@@ -57,33 +67,30 @@
                         color: 'black'
                         readonly: True
                 BoxLayout:
-                    id: loginlayout
-                    orientation: 'vertical'
-                    BoxLayout:
-                        id: firstloginlayout
-                        Label:
-                            text: 'First Login : '
-                            color: 'black'
-                        Label:
-                            id: firstlogin
-                            text: ''
-                            color: 'black'
-                            readonly: True
-                    BoxLayout:
-                        id: lastloginlayout
-                        Label:
-                            text: 'Last Login : '
-                            color: 'black'
-                        Label:
-                            id: lastlogin
-                            text: ''
-                            color: 'black'
-                            readonly: True
+                    id: firstloginlayout
+                    Label:
+                        text: 'First Login : '
+                        color: 'black'
+                    Label:
+                        id: firstlogin
+                        text: ''
+                        color: 'black'
+                        readonly: True
+                BoxLayout:
+                    id: lastloginlayout
+                    Label:
+                        text: 'Last Login : '
+                        color: 'black'
+                    Label:
+                        id: lastlogin
+                        text: ''
+                        color: 'black'
+                        readonly: True
                 BoxLayout:
                     Label:
                         text: 'Birth date : '
                         color: 'black'
-                    Label:
+                    TextInput:
                         id: birth
                         text: ''
                         color: 'black'
@@ -92,7 +99,7 @@
                     Label:
                         text: 'Phone number : '
                         color: 'black'
-                    Label:
+                    TextInput:
                         id: phone
                         text: ''
                         color: 'black'
@@ -101,7 +108,7 @@
                     Label:
                         text: 'Families : '
                         color: 'black'
-                    Label:
+                    TextInput:
                         id: families
                         text: ''
                         color: 'black'
@@ -110,7 +117,7 @@
                     Label:
                         text: 'Country of residence : '
                         color: 'black'
-                    Label:
+                    TextInput:
                         id: nation
                         text: ''
                         color: 'black'
@@ -119,7 +126,7 @@
                     Label:
                         text: 'Legion of residence : '
                         color: 'black'
-                    Label:
+                    TextInput:
                         id: legion
                         text: ''
                         color: 'black'
@@ -128,7 +135,7 @@
                     Label:
                         text: 'Job occupation : '
                         color: 'black'
-                    Label:
+                    TextInput:
                         id: job
                         text: ''
                         color: 'black'
@@ -137,7 +144,7 @@
                     Label:
                         text: 'Workplace : '
                         color: 'black'
-                    Label:
+                    TextInput:
                         id: jobaddr
                         text: ''
                         color: 'black'
@@ -146,7 +153,7 @@
                     Button:
                         id: changeSaveBtn
                         text: 'Change'
-                        on_release: root.change_profile()
+                        on_release: root.change_save_button()
                     Button:
                         text: 'Exit'
-                        on_release: root.goto_post_screen()
+                        on_release: root.exit_button()

@@ -82,8 +82,8 @@ class UsersDBInterface(DBInterface):
 
         self._token = ''
         self._usernum = 0
-    # 성공시 None, 실패시 ResponseException을 리턴
-    def post_userinfo(self, nickname, mailaddr, password, firstname, lastname):
+    # 성공시 유저번호, 실패시 ResponseException을 리턴
+    def post_userinfo(self, nickname, password, mailaddr, firstname, lastname):
         url = self._url + 'userinfo/'
         data = {
             'nickname': nickname,
@@ -97,6 +97,8 @@ class UsersDBInterface(DBInterface):
 
         if type(response) == ResponseException:
             return response
+        
+        return response
     # 성공시 유저정보, 실패시 ResponseException을 리턴
     def get_userinfo(self, usernum=None):
         url = self._url + 'userinfo/'
@@ -126,6 +128,19 @@ class UsersDBInterface(DBInterface):
 
         if type(response) == ResponseException:
             return response
+    # 성공시 None, 실패시 ResponseException을 리턴
+    def delete_userinfo(self):
+        url = self._url + 'userinfo/'
+        headers = self.get_header()
+        data = {}
+
+        response = self._delete(url, headers=headers, data=data)
+
+        if type(response) == ResponseException:
+            return response
+        
+        self._token = ''
+        self._usernum = 0
 usersdbinterface = UsersDBInterface()
 
 # 유저 상세정보 관리 인터페이스 클래스
@@ -135,9 +150,10 @@ class UserDetailsDBInterface(DBInterface):
         self._url += 'users/'
         # 성공시 None, 실패시 Popup을 리턴
     # 성공시 None, 실패시 ResponseException을 리턴
-    def post_userinfo(self, birth, phone, families, nation, legion, job, jobaddr):
-        url = self._url + 'userinfo/'
+    def post_userdetail(self, usernum, birth, phone, families, nation, legion, job, jobaddr):
+        url = self._url + 'userdetail/'
         data = {
+            'usernum': usernum,
             'birth': birth,
             'phone': phone,
             'families': families,
@@ -152,7 +168,7 @@ class UserDetailsDBInterface(DBInterface):
         if type(response) == ResponseException:
             return response
     # 성공시 유저정보, 실패시 ResponseException을 리턴
-    def get_userinfo(self, usernum=None):
+    def get_userdetail(self, usernum=None):
         url = self._url + 'userdetail/'
         headers = usersdbinterface.get_header()
         data = {
@@ -166,8 +182,8 @@ class UserDetailsDBInterface(DBInterface):
         
         return response
     # 성공시 None, 실패시 ResponseException을 리턴
-    def put_userinfo(self, birth, phone, families, nation, legion, job, jobaddr):
-        url = self._url + 'userinfo/'
+    def put_userdetail(self, birth, phone, families, nation, legion, job, jobaddr):
+        url = self._url + 'userdetail/'
         headers = usersdbinterface.get_header()
         data = {
             'birth': birth,
@@ -184,8 +200,8 @@ class UserDetailsDBInterface(DBInterface):
         if type(response) == ResponseException:
             return response
     # 성공시 None, 실패시 ResponseException을 리턴
-    def delete_userinfo(self):
-        url = self._url + 'userinfo/'
+    def delete_userdetail(self):
+        url = self._url + 'userdetail/'
         headers = usersdbinterface.get_header()
         data = {}
 
