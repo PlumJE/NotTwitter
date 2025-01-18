@@ -76,16 +76,28 @@ class UserInfoView(APIView):
             firstname = request.data.get('firstname')
             lastname = request.data.get('lastname')
 
+            # 닉네임-비밀번호 조합이 이미 있으면 거부한다
+            user = authenticate(username=username, password=password)
+            if user:
+                raise AuthenticationFailed('Invalid username or password!')
+
             User.objects.create_user(
                 username=username, 
                 password=password,
                 email=email,
-                firstname=firstname,
-                lastname=lastname
+                first_name=firstname,
+                last_name=lastname
             )
 
+            user = authenticate(username=username, password=password)
+            if not user:
+                raise AuthenticationFailed('Failed to get User number!')
+
             return Response(
-                {'message': 'Signup successful'}, 
+                {
+                    'message': 'Signup successful',
+                    'usernum': user.id
+                }, 
                 status=status.HTTP_201_CREATED
             )
         except APIException as e:
@@ -102,8 +114,8 @@ class UserInfoView(APIView):
     def get(self, request):
         try:
             id = request.data.get('usernum')
-            userinfo = User.objects.get(id=id)
 
+            userinfo = User.objects.get(id=id)
             username = userinfo.username
             email = userinfo.email
             firstname = userinfo.first_name
@@ -136,16 +148,15 @@ class UserInfoView(APIView):
     def put(self, request):
         try:
             id = request.headers.get('usernum')
-
-            username = request.data.get('nickname')
+            username = request.data.get('nickname')     # 새롭게 바꿀 닉네임임
             email = request.data.get('mailaddr')
             firstname = request.data.get('firstname')
             lastname = request.data.get('lastname')
 
-            password = User.objects.filter(id=id).get('password')
-            print('password is', password)
-            if User.objects.filter(username=username, password=password).exists():
-                raise ValidationError('Nickname and password are overlaped.')
+            # 닉네임 변경시 이미 있는 닉네임-비밀번호 조합이 발견되면 수정을 거부한다
+            user = User.objects.get(id=id)
+            if user.username != username and authenticate(username=username, password=user.password):
+                raise AuthenticationFailed('Invalid username or password!')
 
             User.objects.filter(id=id).update(
                 username=username,
@@ -154,15 +165,29 @@ class UserInfoView(APIView):
                 last_name=lastname
             )
 
-            # user = request.user
-            # user.username = username
-            # user.email = email
-            # user.first_name = firstname
-            # user.last_name = lastname
-            # user.save()
-
             return Response(
                 {'message': 'UserInfo updated successfully.'},
+                status=status.HTTP_200_OK
+            )
+        except APIException as e:
+            return Response(
+                {'error': str(e)},
+                status=e.status_code
+            )
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    # 회원정보 삭제
+    def delete(self, request):
+        try:
+            id = request.headers.get('usernum')
+
+            UserDetails.objects.filter(id=id).delete()
+
+            return Response(
+                {'message': 'UserDetails updated successfully.'},
                 status=status.HTTP_200_OK
             )
         except APIException as e:
@@ -181,10 +206,10 @@ class UserDetailView(APIView):
     # 상세정보 추가
     def post(self, request):
         try:
-            id = request.headers.get('usernum')
-            # password = User.objects.filter(id=id).get('password')
-
+            id = request.data.get('usernum')
             birth = request.data.get('birth')
+            if birth == '':
+                birth = '1000-01-01'
             phone = request.data.get('phone')
             families = request.data.get('families')
             nation = request.data.get('nation')
@@ -192,7 +217,7 @@ class UserDetailView(APIView):
             job = request.data.get('job')
             jobaddr = request.data.get('jobaddr')
 
-            UserDetails.objects.create_user(
+            UserDetails.objects.create(
                 id=id,
                 birth=birth,
                 phone=phone,
@@ -257,9 +282,10 @@ class UserDetailView(APIView):
     def put(self, request):
         try:
             id = request.headers.get('usernum')
-            # password = User.objects.filter(id=id).get('password')
 
             birth = request.data.get('birth')
+            if birth == '':
+                birth = '1900-01-01'
             phone = request.data.get('phone')
             families = request.data.get('families')
             nation = request.data.get('nation')
@@ -276,13 +302,6 @@ class UserDetailView(APIView):
                 job=job,
                 jobaddr=jobaddr
             )
-
-            # user = request.user
-            # user.username = username
-            # user.email = email
-            # user.first_name = firstname
-            # user.last_name = lastname
-            # user.save()
 
             return Response(
                 {'message': 'UserDetails updated successfully.'},
@@ -302,16 +321,8 @@ class UserDetailView(APIView):
     def delete(self, request):
         try:
             id = request.headers.get('usernum')
-            # password = User.objects.filter(id=id).get('password')
 
             UserDetails.objects.filter(id=id).delete()
-
-            # user = request.user
-            # user.username = username
-            # user.email = email
-            # user.first_name = firstname
-            # user.last_name = lastname
-            # user.save()
 
             return Response(
                 {'message': 'UserDetails updated successfully.'},

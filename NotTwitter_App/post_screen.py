@@ -57,6 +57,8 @@ class PostUnit(ButtonBehavior, BoxLayout):
 # 게시글 스크린 클래스
 class PostScreen(Screen):
     bg_path = graphics_folder + '/post_background.jpg'
+    category = 'all'
+    order = 'id'
     # 게시글 스크린으로 들어가기 직전의 행동이다
     def on_pre_enter(self, *args):
         userinfo = usersdbinterface.get_userinfo()
@@ -78,7 +80,7 @@ class PostScreen(Screen):
         else:
             postsdbinterface.put_id_prefix(id_prefix)
         # parent가 ''이면 공지사항 게시글을 맨 위에 추가한다
-        if (id_prefix == ''):
+        if id_prefix == '' and where == '' and order == '':
             self.ids.body.add_widget(PostUnit('', 'NotTwitter', '2000-00-00', 
 """Welcome to this app!
 This is copycat of Twitter(current day X),
@@ -89,13 +91,11 @@ Post carefully!"""))
         postlist = postsdbinterface.get_postlist(where, order)
         if type(postlist) == ResponseException:
             ErrorPopup('Adjust error!', str(postlist)).open()
-            self.goto_login_screen()
             return
         for post in postlist:
             result = postsdbinterface.get_post(post)
             if type(result) == ResponseException:
                 ErrorPopup('Adjust error!', str(result)).open()
-                self.goto_login_screen()
                 return
             id = result.get('id')
             writer = result.get('writer')
@@ -103,12 +103,40 @@ Post carefully!"""))
             userinfo = usersdbinterface.get_userinfo(writer)
             if type(userinfo) == ResponseException:
                 ErrorPopup('Adjust error!', str(userinfo)).open()
-                self.goto_login_screen()
                 return
             writer = userinfo.get('nickname')
             writedate = result.get('writedate')
             content = result.get('content')
             self.ids.body.add_widget(PostUnit(id, writer, writedate, content))
+    # 스피너의 값을 저장한다
+    def spinner_select(self, spinner):
+        match spinner:
+            case self.ids.category:
+                self.category = spinner.text
+            case self.ids.order:
+                self.order = spinner.text
+    # 게시글을 검색한다
+    def searchposts(self, *args):
+        searchword = self.ids.search_text.text
+        match self.ids.category.text:
+            case 'All':
+                where = 'content like "%{}%" and writer like "%{}%"'.format(searchword)
+            case 'Content':
+                where = 'content like "%{}%"'.format(searchword)
+            case 'Writer':
+                where = 'writer like "%{}%"'.format(searchword)
+            case _:
+                return
+        match self.ids.order.text:
+            case 'Post id order':
+                order = 'id'
+            case 'Content order':
+                order = 'content'
+            case 'Writer order':
+                order = 'writer'
+            case _:
+                return
+        self.updateposts(where=where, order=order)
     # 이전에 방문한 게시글 및 그의 자식들을 불러온다
     def go_prev(self, *args):
         log = searchlog.prev()

@@ -15,17 +15,15 @@ class PostlistView(APIView):
             rawsql = "SELECT id FROM posts_posts"
 
             id_prefix = request.data.get('id_prefix')
-            if id_prefix:
+            where = request.data.get('where')
+            order = request.data.get('order')
+
+            if where and order:
+                rawsql += " where " + where + " order by " + order
+            elif id_prefix:
                 rawsql += " where id regexp '^" + id_prefix + "(/[0-9]+)?$' "
             else:
                 rawsql += " where id regexp '^[0-9]+$' "
-            
-            where = request.data.get('where')
-            if where:
-                rawsql += " and " + where
-            order = request.data.get('order')
-            if order:
-                rawsql += " order by " + order
 
             posts = [post.id for post in Posts.objects.raw(rawsql)]
             if posts == []:

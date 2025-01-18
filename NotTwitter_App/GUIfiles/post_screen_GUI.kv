@@ -45,7 +45,7 @@
     BoxLayout:
         orientation: 'vertical'
         BoxLayout:
-            size_hint_y: 0.1
+            size_hint_y: 0.05
             canvas.before:
                 Color:
                     rgba: 1, 1, 1, 1
@@ -62,14 +62,6 @@
                 text: ''
                 color: 'black'
             Button:
-                id: search_btn
-                text: 'Search'
-                on_release: None
-            Button:
-                id: home_btn
-                text: 'Go Home'
-                on_release: root.updateposts('')
-            Button:
                 id: profile_btn
                 text: 'Profile'
                 on_release: root.goto_profile_screen()
@@ -77,9 +69,37 @@
                 id: settings_btn
                 text: 'Settings'
                 on_release: root.goto_setting_screen()
+        BoxLayout:
+            size_hint_y: 0.05
+            canvas.before:
+                Color:
+                    rgba: 1, 1, 1, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+                Color:
+                    rgba: 0.2, 0.5, 1, 1
+                Line:
+                    width: 1.5
+                    rectangle: self.x, self.y, self.width, self.height
+            Spinner:
+                id: category
+                text: 'Category'
+                values: 'All', 'Content', 'Writer'
+                # on_text: root.category_select(self, self.text)
+            TextInput:
+                id: search_text
+            Spinner:
+                id: order
+                text: 'Order'
+                values: 'Post id order', 'Content order', 'Writer order'
+                # on_text: root.order_select(self, self.text)
+            Button:
+                text: 'Search'
+                on_release: root.searchposts()
         ScrollView:
             size_hint_x: 0.9
-            size_hint_y: 0.8
+            size_hint_y: 0.85
             pos_hint: {'center_x':0.5, 'center_y':0.5}
             do_scroll_x: False
             do_scroll_y: True
@@ -89,13 +109,17 @@
                 height: self.minimum_height
                 orientation: 'vertical'
         BoxLayout:
-            size_hint_y: 0.1
+            size_hint_y: 0.05
             Button:
                 text: 'Write new post'
                 on_release: root.goto_edit_screen()
             Button:
                 text: 'Prev'
                 on_release: root.go_prev()
+            Button:
+                id: home_btn
+                text: 'Go Home'
+                on_release: root.updateposts('')
             Button:
                 text: 'Next'
                 on_release: root.go_next()
