@@ -2,8 +2,8 @@ from datetime import datetime
 from kivy.lang.builder import Builder
 from kivy.uix.screenmanager import Screen
 
-from custom_popup import ErrorPopup
 from db_interface import ResponseException, usersdbinterface, postsdbinterface
+from common import AlertPopup
 from folder_paths import GUI_folder, graphics_folder
 
 
@@ -18,7 +18,7 @@ class EditScreen(Screen):
     def on_pre_enter(self, *args):
         userinfo = usersdbinterface.get_userinfo()
         if type(userinfo) == ResponseException:
-            ErrorPopup('Adjust error!', str(userinfo)).open()
+            AlertPopup('Adjust error!', str(userinfo)).open()
             self.goto_post_screen()
             return
         self.writer = userinfo.get('nickname')
@@ -33,7 +33,7 @@ class EditScreen(Screen):
             return
         result = postsdbinterface.post_post(self.writedate, content)
         if type(result) == ResponseException:
-            ErrorPopup('Adjust error!', str(result)).open()
+            AlertPopup('Adjust error!', str(result)).open()
             return
         editscreen.goto_post_screen()
     # 게시글 작성을 포기한다

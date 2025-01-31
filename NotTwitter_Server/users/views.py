@@ -158,12 +158,17 @@ class UserInfoView(APIView):
             if user.username != username and authenticate(username=username, password=user.password):
                 raise AuthenticationFailed('Invalid username or password!')
 
-            User.objects.filter(id=id).update(
-                username=username,
-                email=email,
-                first_name=firstname,
-                last_name=lastname
-            )
+            # None이 아닐 경우에만 수정한다
+            user = User.objects.get(id=id)
+            if username:
+                user.username = username
+            if email:
+                user.email = email
+            if firstname:
+                user.first_name = firstname
+            if lastname:
+                user.last_name = lastname
+            user.save()
 
             return Response(
                 {'message': 'UserInfo updated successfully.'},
@@ -293,15 +298,23 @@ class UserDetailView(APIView):
             job = request.data.get('job')
             jobaddr = request.data.get('jobaddr')
 
-            UserDetails.objects.filter(id=id).update(
-                birth=birth,
-                phone=phone,
-                families=families,
-                nation=nation,
-                legion=legion,
-                job=job,
-                jobaddr=jobaddr
-            )
+            # None이 아닐 경우에만 수정한다
+            user = User.objects.get(id=id)
+            if birth:
+                user.birth = birth
+            if phone:
+                user.phone = phone
+            if families:
+                user.families = families
+            if nation:
+                user.nation = nation
+            if legion:
+                user.legion = legion
+            if job:
+                user.job = job
+            if jobaddr:
+                user.jobaddr = jobaddr
+            user.save()
 
             return Response(
                 {'message': 'UserDetails updated successfully.'},

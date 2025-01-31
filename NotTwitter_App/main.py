@@ -13,11 +13,11 @@ from login_screen import loginscreen
 from post_screen import postscreen
 from edit_screen import editscreen
 from profile_screen import profilescreen
-from setting_screen import settingscreen
-from debug import logger
+from menu_screen import menuscreen
 
 
 Window.clearcolor = (1, 1, 1, 1)
+Window.size = (350, 750)
 
 class NotTwitterApp(App):
     screen_manager = ScreenManager()
@@ -27,11 +27,8 @@ class NotTwitterApp(App):
         self.screen_manager.add_widget(postscreen)
         self.screen_manager.add_widget(editscreen)
         self.screen_manager.add_widget(profilescreen)
-        self.screen_manager.add_widget(settingscreen)
+        self.screen_manager.add_widget(menuscreen)
         return self.screen_manager
 
 if __name__ == "__main__":
-    try:
-        NotTwitterApp().run()
-    except Exception as e:
-        logger.critical('Leathal error has occurred!! : ' + str(e))
+    NotTwitterApp().run()

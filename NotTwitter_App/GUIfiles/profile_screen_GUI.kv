@@ -1,8 +1,15 @@
-<ProfileScreen>:
-    Image:
-        size_hint: 1, 1
-        source: root.bg_path
-        fit_mode: "fill"
+<ProfileRecentScreen>:
+    ScrollView:
+        size_hint_y: 0.85
+        do_scroll_x: False
+        do_scroll_y: True
+        BoxLayout:
+            id: recentlist
+            size_hint_y: None
+            height: self.minimum_height
+            orientation: 'vertical'
+
+<ProfileDetailScreen>:
     ScrollView:
         padding: 5, 5, 5, 5
         do_scroll_x: False
@@ -19,35 +26,6 @@
                     Rectangle:
                         pos: self.pos
                         size: self.size
-                BoxLayout:
-                    orientation: "vertical"
-                    size_hint_x: 0.5
-                    Label:
-                        text: 'Profile image'
-                        color: 'black'
-                    
-                    # 여기에 이미지 위젯을 삽입
-                        
-                BoxLayout:
-                    id: nicknamelayout
-                    Label:
-                        text: 'Nickname : '
-                        color: 'black'
-                    TextInput:
-                        id: nickname
-                        text: ''
-                        color: 'black'
-                        readonly: True
-                BoxLayout:
-                    id: mailaddrlayout
-                    Label:
-                        text: 'Email address : '
-                        color: 'black'
-                    TextInput:
-                        id: mailaddr
-                        text: ''
-                        color: 'black'
-                        readonly: True
                 BoxLayout:
                     Label:
                         text: 'First name : '
@@ -87,15 +65,7 @@
                         color: 'black'
                         readonly: True
                 BoxLayout:
-                    Label:
-                        text: 'Birth date : '
-                        color: 'black'
-                    TextInput:
-                        id: birth
-                        text: ''
-                        color: 'black'
-                        readonly: True
-                BoxLayout:
+                    id: phonelayout
                     Label:
                         text: 'Phone number : '
                         color: 'black'
@@ -149,11 +119,80 @@
                         text: ''
                         color: 'black'
                         readonly: True
+                Button:
+                    id: SaveBtn
+                    text: 'Save'
+                    on_release: root.save_profile()
+
+<ProfileScreen>:
+    Image:
+        size_hint: 1, 1
+        source: root.bg_path
+        fit_mode: "fill"
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            size_hint_y: 0.25
+            canvas.before:
+                Color:
+                    rgba: 1, 1, 1, 0.75
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+                Color:
+                    rgba: 0.2, 0.5, 1, 1
+                Line:
+                    width: 1.5
+                    rectangle: self.x, self.y, self.width, self.height
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_x: 0.4
+                Image:
+                    size_hint_y: 0.8
+                Button:
+                    size_hint: None, None
+                    size_x: self.text_size
+                    size_y: self.text_size
+                    pos_hint_x: 0.5
+                    text: 'Change'
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_x: 0.6
+                TextInput:
+                    id: nickname
+                    text: 'Hello'
                 BoxLayout:
-                    Button:
-                        id: changeSaveBtn
-                        text: 'Change'
-                        on_release: root.change_save_button()
-                    Button:
-                        text: 'Exit'
-                        on_release: root.exit_button()
+                    Label:
+                        text: 'Hello'
+                        color: 'black'
+                        size_hint_x: 0.2
+                    TextInput:
+                        id: mailaddr
+                        text: 'Hello'
+                        size_hint_x: 0.8
+                BoxLayout:
+                    Label:
+                        text: 'Hello'
+                        color: 'black'
+                        size_hint_x: 0.2
+                    TextInput:
+                        id: birth
+                        text: 'Hello'
+                        size_hint_x: 0.8
+                Button:
+                    text: 'Change!'
+        BoxLayout:
+            size_hint_y: 0.7
+            ScreenManager:
+                id: body
+        BoxLayout:
+            size_hint_y: 0.05
+            Button:
+                text: 'Recent'
+                on_release: root.goto_profile_recent_screen()
+            Button:
+                text: 'Detail'
+                on_release: root.goto_profile_detail_screen()
+            Button:
+                text: 'Go Out'
+                on_release: root.goto_post_screen()

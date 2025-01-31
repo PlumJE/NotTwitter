@@ -12,22 +12,29 @@ class PostlistView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     def get(self, request):
         try:
-            rawsql = "SELECT id FROM posts_posts"
+            rawsql = "SELECT posts.id FROM posts_posts AS posts JOIN auth_user AS user ON posts.writer=user.id "
 
             id_prefix = request.data.get('id_prefix')
             where = request.data.get('where')
             order = request.data.get('order')
 
-            if where and order:
-                rawsql += " where " + where + " order by " + order
+            if where:
+                rawsql += " WHERE " + where
             elif id_prefix:
-                rawsql += " where id regexp '^" + id_prefix + "(/[0-9]+)?$' "
+                rawsql += " WHERE posts.id regexp '^" + id_prefix + "(/[0-9]+)?$' "
             else:
-                rawsql += " where id regexp '^[0-9]+$' "
+                rawsql += " WHERE posts.id regexp '^[0-9]+$' "
+
+            if not order and not id_prefix:
+                rawsql += " ORDER BY posts.id DESC"
+            elif order:
+                rawsql += " ORDER BY " + order
+
+            print(rawsql)
 
             posts = [post.id for post in Posts.objects.raw(rawsql)]
-            if posts == []:
-                raise NotFound('No posts found with the given prefix')
+            # if posts == []:
+            #     raise NotFound('No posts found with the given prefix')
 
             return Response(
                 {'id_list': posts},

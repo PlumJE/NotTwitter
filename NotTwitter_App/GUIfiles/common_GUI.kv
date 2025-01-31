@@ -1,0 +1,65 @@
+<PostUnit>
+    height: self.minimum_height
+    size_hint_y: None
+    orientation: 'vertical'
+    on_release: None
+    canvas:
+        Color:
+            rgba: 0.9, 0.9, 0.9, 0.75
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+    BoxLayout:
+        height: dp(40)
+        size_hint_y: None
+        padding: dp(10)
+        Label:
+            id: writer
+            text: 'Writer : '
+            color: 'black'
+            text_size: self.size
+            halign: 'left'
+            valign: 'middle'
+        Label:
+            id: writedate
+            text: 'Write date : '
+            color: 'black'
+            text_size: self.size
+            halign: 'left'
+            valign: 'middle'
+    Label:
+        id: content
+        color: 'black'
+        height: self.texture_size[1]
+        size_hint_y: None
+        padding: dp(20)
+        text_size: self.width, None
+        halign: 'left'
+        valign: 'middle'
+
+<AlertPopup>:
+    size_hint: 1, 0.2
+    auto_dismiss: True
+
+<SelectPopup>
+    size_hint: 1, 0.2
+    auto_dismiss: True
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            id: content
+        BoxLayout:
+            Button:
+                id: yesBtn
+                on_release: root.set_result(True)
+            Button:
+                id: noBtn
+                on_release: root.set_result(False)
+
+<InsertPopup>
+    size_hint: 1, 0.2
+    auto_dismiss: True
+    BoxLayout:
+        orientation: 'vertical'
+        TextInput:
+            

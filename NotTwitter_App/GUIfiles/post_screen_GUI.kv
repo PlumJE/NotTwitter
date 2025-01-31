@@ -1,41 +1,4 @@
-<PostUnit>
-    height: self.minimum_height
-    size_hint_y: None
-    orientation: 'vertical'
-    on_release: root.updateposts()
-    canvas:
-        Color:
-            rgba: 0.9, 0.9, 0.9, 0.75
-        RoundedRectangle:
-            size: self.size
-            pos: self.pos
-    BoxLayout:
-        height: dp(40)
-        size_hint_y: None
-        padding: dp(10)
-        Label:
-            id: writer
-            text: 'Writer : '
-            color: 'black'
-            text_size: self.size
-            halign: 'left'
-            valign: 'middle'
-        Label:
-            id: writedate
-            text: 'Write date : '
-            color: 'black'
-            text_size: self.size
-            halign: 'left'
-            valign: 'middle'
-    Label:
-        id: content
-        color: 'black'
-        height: self.texture_size[1]
-        size_hint_y: None
-        padding: dp(20)
-        text_size: self.width, None
-        halign: 'left'
-        valign: 'middle'
+<ButtonLayout>
 
 <PostScreen>
     Image:
@@ -57,69 +20,68 @@
                 Line:
                     width: 1.5
                     rectangle: self.x, self.y, self.width, self.height
-            Label:
-                id: welcome_message
-                text: ''
-                color: 'black'
-            Button:
-                id: profile_btn
-                text: 'Profile'
+            ButtonLayout:
+                size_hint_x: 0.7
                 on_release: root.goto_profile_screen()
+                Label:
+                    id: welcome_message
+                    text: 'Welcome, User!'
+                    color: 'black'
             Button:
-                id: settings_btn
-                text: 'Settings'
-                on_release: root.goto_setting_screen()
-        BoxLayout:
-            size_hint_y: 0.05
-            canvas.before:
-                Color:
-                    rgba: 1, 1, 1, 1
-                Rectangle:
-                    pos: self.pos
-                    size: self.size
-                Color:
-                    rgba: 0.2, 0.5, 1, 1
-                Line:
-                    width: 1.5
-                    rectangle: self.x, self.y, self.width, self.height
-            Spinner:
-                id: category
-                text: 'Category'
-                values: 'All', 'Content', 'Writer'
-                # on_text: root.category_select(self, self.text)
-            TextInput:
-                id: search_text
-            Spinner:
-                id: order
-                text: 'Order'
-                values: 'Post id order', 'Content order', 'Writer order'
-                # on_text: root.order_select(self, self.text)
-            Button:
-                text: 'Search'
-                on_release: root.searchposts()
-        ScrollView:
-            size_hint_x: 0.9
-            size_hint_y: 0.85
-            pos_hint: {'center_x':0.5, 'center_y':0.5}
-            do_scroll_x: False
-            do_scroll_y: True
+                id: menu_button
+                text: 'Menu'
+                size_hint_x: 0.3
+                on_release: None
+        FloatLayout:
+            size_hint_y: 0.9
             BoxLayout:
-                id: body
-                size_hint_y: None
-                height: self.minimum_height
                 orientation: 'vertical'
-        BoxLayout:
-            size_hint_y: 0.05
+                size_hint_x: 0.9
+                pos_hint: {'center_x':0.5, 'center_y':0.5}
+                BoxLayout:
+                    size_hint_y: 0.05
+                    Spinner:
+                        size_hint_x: 0.2
+                        id: category
+                        text: 'Category'
+                        values: 'All', 'Content', 'Writer'
+                    Spinner:
+                        size_hint_x: 0.2
+                        id: order
+                        text: 'Order'
+                        values: 'Default order', 'Content order', 'Writer order'
+                    TextInput:
+                        size_hint_x: 0.4
+                        id: search_text
+                    Button:
+                        size_hint_x: 0.2
+                        text: 'Search'
+                        on_release: root.searchposts()
+                ScrollView:
+                    size_hint_y: 0.85
+                    do_scroll_x: False
+                    do_scroll_y: True
+                    BoxLayout:
+                        id: body
+                        size_hint_y: None
+                        height: self.minimum_height
+                        orientation: 'vertical'
             Button:
+                size_hint: None, None
+                # size_x: self.minimum_width
+                # size_y: self.minimum_height
+                pos_hint: {'center_x':0.9, 'center_y':0.1}
                 text: 'Write new post'
                 on_release: root.goto_edit_screen()
+        BoxLayout:
+            size_hint_y: 0.05
             Button:
-                text: 'Prev'
+                text: '<< Prev'
                 on_release: root.go_prev()
             Button:
                 id: home_btn
                 text: 'Go Home'
                 on_release: root.updateposts('')
             Button:
-                text: 'Next'
+                text: 'Next >>'
                 on_release: root.go_next()
