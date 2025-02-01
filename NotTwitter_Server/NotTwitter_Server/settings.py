@@ -27,8 +27,8 @@ SECRET_KEY = 'django-insecure-j3j4#eq-)ucrg6o(397v*fnrh1$ui8htlc#b5r%i1ai$(f!zbv
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '172.30.1.54',
-    '127.0.0.1'
+    # '127.0.0.1'
+    '*'     # 모든 IP 검색어를 받아들임. 매우 위험!!
 ]
 
 

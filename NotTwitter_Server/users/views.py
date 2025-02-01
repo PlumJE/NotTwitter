@@ -82,7 +82,7 @@ class UserInfoView(APIView):
                 raise AuthenticationFailed('Invalid username or password!')
 
             User.objects.create_user(
-                username=username, 
+                username=username,
                 password=password,
                 email=email,
                 first_name=firstname,
@@ -158,16 +158,10 @@ class UserInfoView(APIView):
             if user.username != username and authenticate(username=username, password=user.password):
                 raise AuthenticationFailed('Invalid username or password!')
 
-            # None이 아닐 경우에만 수정한다
-            user = User.objects.get(id=id)
-            if username:
-                user.username = username
-            if email:
-                user.email = email
-            if firstname:
-                user.first_name = firstname
-            if lastname:
-                user.last_name = lastname
+            user.username=username
+            user.email=email
+            user.first_name=firstname
+            user.last_name=lastname
             user.save()
 
             return Response(
@@ -211,10 +205,8 @@ class UserDetailView(APIView):
     # 상세정보 추가
     def post(self, request):
         try:
-            id = request.data.get('usernum')
+            id = request.headers.get('usernum')
             birth = request.data.get('birth')
-            if birth == '':
-                birth = '1000-01-01'
             phone = request.data.get('phone')
             families = request.data.get('families')
             nation = request.data.get('nation')
@@ -224,8 +216,8 @@ class UserDetailView(APIView):
 
             UserDetails.objects.create(
                 id=id,
-                birth=birth,
-                phone=phone,
+                birth=birth if birth else '1000-01-01',
+                phone=phone if phone else '010-0000-0000',
                 families=families,
                 nation=nation,
                 legion=legion,
@@ -289,8 +281,6 @@ class UserDetailView(APIView):
             id = request.headers.get('usernum')
 
             birth = request.data.get('birth')
-            if birth == '':
-                birth = '1900-01-01'
             phone = request.data.get('phone')
             families = request.data.get('families')
             nation = request.data.get('nation')
@@ -298,22 +288,14 @@ class UserDetailView(APIView):
             job = request.data.get('job')
             jobaddr = request.data.get('jobaddr')
 
-            # None이 아닐 경우에만 수정한다
-            user = User.objects.get(id=id)
-            if birth:
-                user.birth = birth
-            if phone:
-                user.phone = phone
-            if families:
-                user.families = families
-            if nation:
-                user.nation = nation
-            if legion:
-                user.legion = legion
-            if job:
-                user.job = job
-            if jobaddr:
-                user.jobaddr = jobaddr
+            user = UserDetails.objects.get(id=id)
+            user.birth=birth if birth else '1000-01-01'
+            user.phone=phone if phone else '010-0000-0000'
+            user.families=families
+            user.nation=nation
+            user.legion=legion
+            user.job=job
+            user.jobaddr=jobaddr
             user.save()
 
             return Response(

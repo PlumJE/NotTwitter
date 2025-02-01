@@ -23,15 +23,16 @@ class SettingScreen(Screen):
     # 로그인 스크린으로 들어간다
     def goto_login_screen(self):
         self.manager.current = 'Login Screen'
+menuscreen = SettingScreen(name='Menu Screen')
 
-class MenuScreen(Screen):
-    bg_path = graphics_folder + '/post_background.jpg'
-    screen_manager = ScreenManager()
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.screen_manager.add_widget(SettingScreen(name='Setting Screen'))
-    def goto_login_screen(self):
-        self.manager.current = 'Login Screen'
-    def goto_post_screen(self):
-        self.manager.current = 'Post Screen'
-menuscreen = MenuScreen(name='Menu Screen')
+# class MenuScreen(Screen):
+#     bg_path = graphics_folder + '/post_background.jpg'
+#     screen_manager = ScreenManager()
+#     def __init__(self, **kwargs):
+#         super().__init__(**kwargs)
+#         self.screen_manager.add_widget(SettingScreen(name='Setting Screen'))
+#     def goto_login_screen(self):
+#         self.manager.current = 'Login Screen'
+#     def goto_post_screen(self):
+#         self.manager.current = 'Post Screen'
+# menuscreen = MenuScreen(name='Menu Screen')

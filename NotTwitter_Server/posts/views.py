@@ -18,23 +18,21 @@ class PostlistView(APIView):
             where = request.data.get('where')
             order = request.data.get('order')
 
-            if where:
-                rawsql += " WHERE " + where
-            elif id_prefix:
+            if id_prefix:
                 rawsql += " WHERE posts.id regexp '^" + id_prefix + "(/[0-9]+)?$' "
+            elif where:
+                rawsql += " WHERE " + where
             else:
                 rawsql += " WHERE posts.id regexp '^[0-9]+$' "
 
-            if not order and not id_prefix:
-                rawsql += " ORDER BY posts.id DESC"
-            elif order:
+            if id_prefix:
+                rawsql += " ORDER BY posts.id "
+            elif not order or order == 'id':
+                rawsql += " ORDER BY posts.id DESC "
+            else:
                 rawsql += " ORDER BY " + order
 
-            print(rawsql)
-
             posts = [post.id for post in Posts.objects.raw(rawsql)]
-            # if posts == []:
-            #     raise NotFound('No posts found with the given prefix')
 
             return Response(
                 {'id_list': posts},

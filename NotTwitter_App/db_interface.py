@@ -1,4 +1,4 @@
-from requests import post, get, put, delete
+from requests import post, get, put, delete, patch
 from requests.exceptions import *
 
 
@@ -80,6 +80,12 @@ class UsersDBInterface(DBInterface):
 
         self._token = ''
         self._usernum = 0
+    # 로그인 상태인지 아님 로그아웃 상태인지 판별
+    def is_login(self):
+        if self._usernum and self._token:
+            return True
+        else:
+            return False
     # 성공시 유저번호, 실패시 ResponseException을 리턴
     def post_userinfo(self, nickname, password, mailaddr, firstname, lastname):
         url = self._url + 'userinfo/'
@@ -148,10 +154,10 @@ class UserDetailsDBInterface(DBInterface):
         self._url += 'users/'
         # 성공시 None, 실패시 Popup을 리턴
     # 성공시 None, 실패시 ResponseException을 리턴
-    def post_userdetail(self, usernum, birth, phone, families, nation, legion, job, jobaddr):
+    def post_userdetail(self, birth, phone, families, nation, legion, job, jobaddr):
         url = self._url + 'userdetail/'
+        headers = usersdbinterface.get_header()
         data = {
-            'usernum': usernum,
             'birth': birth,
             'phone': phone,
             'families': families,
@@ -161,7 +167,7 @@ class UserDetailsDBInterface(DBInterface):
             'jobaddr': jobaddr
         }
 
-        response = self._post(url, data=data)
+        response = self._post(url, headers=headers, data=data)
 
         if type(response) == ResponseException:
             return response

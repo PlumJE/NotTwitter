@@ -31,7 +31,7 @@
                 id: menu_button
                 text: 'Menu'
                 size_hint_x: 0.3
-                on_release: None
+                on_release: root.goto_menu_screen()
         FloatLayout:
             size_hint_y: 0.9
             BoxLayout:
@@ -43,13 +43,13 @@
                     Spinner:
                         size_hint_x: 0.2
                         id: category
-                        text: 'Category'
-                        values: 'All', 'Content', 'Writer'
+                        text: 'About'
+                        values: 'About', 'in Content', 'in Writer'
                     Spinner:
                         size_hint_x: 0.2
                         id: order
                         text: 'Order'
-                        values: 'Default order', 'Content order', 'Writer order'
+                        values: 'Order', 'by Time', 'by Content', 'by Writer'
                     TextInput:
                         size_hint_x: 0.4
                         id: search_text

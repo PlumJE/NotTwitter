@@ -1,3 +1,5 @@
+#: import InsertPopup common.InsertPopup
+
 <ProfileRecentScreen>:
     ScrollView:
         size_hint_y: 0.85
@@ -26,24 +28,43 @@
                     Rectangle:
                         pos: self.pos
                         size: self.size
+                Label:
+                    text: 'Essential'
+                    color: 'black'
+                BoxLayout:
+                    id: nicknamelayout
+                    Label:
+                        text: 'Nickname : '
+                        color: 'black'
+                    TextInput:
+                        id: nickname
+                BoxLayout:
+                    Label:
+                        text: 'Mail address : '
+                        color: 'black'
+                    TextInput:
+                        id: mailaddr
+                BoxLayout:
+                    Label:
+                        text: 'Birth date : '
+                        color: 'black'
+                    TextInput:
+                        id: birth
+                Label:
+                    text: 'Optional'
+                    color: 'black'
                 BoxLayout:
                     Label:
                         text: 'First name : '
                         color: 'black'
                     TextInput:
                         id: firstname
-                        text: ''
-                        color: 'black'
-                        readonly: True
                 BoxLayout:
                     Label:
                         text: 'Last name : '
                         color: 'black'
                     TextInput:
                         id: lastname
-                        text: ''
-                        color: 'black'
-                        readonly: True
                 BoxLayout:
                     id: firstloginlayout
                     Label:
@@ -51,9 +72,7 @@
                         color: 'black'
                     Label:
                         id: firstlogin
-                        text: ''
                         color: 'black'
-                        readonly: True
                 BoxLayout:
                     id: lastloginlayout
                     Label:
@@ -61,9 +80,7 @@
                         color: 'black'
                     Label:
                         id: lastlogin
-                        text: ''
                         color: 'black'
-                        readonly: True
                 BoxLayout:
                     id: phonelayout
                     Label:
@@ -71,36 +88,24 @@
                         color: 'black'
                     TextInput:
                         id: phone
-                        text: ''
-                        color: 'black'
-                        readonly: True
                 BoxLayout:
                     Label:
                         text: 'Families : '
                         color: 'black'
                     TextInput:
                         id: families
-                        text: ''
-                        color: 'black'
-                        readonly: True
                 BoxLayout:
                     Label:
                         text: 'Country of residence : '
                         color: 'black'
                     TextInput:
                         id: nation
-                        text: ''
-                        color: 'black'
-                        readonly: True
                 BoxLayout:
                     Label:
                         text: 'Legion of residence : '
                         color: 'black'
                     TextInput:
                         id: legion
-                        text: ''
-                        color: 'black'
-                        readonly: True
                 BoxLayout:
                     Label:
                         text: 'Job occupation : '
@@ -108,8 +113,6 @@
                     TextInput:
                         id: job
                         text: ''
-                        color: 'black'
-                        readonly: True
                 BoxLayout:
                     Label:
                         text: 'Workplace : '
@@ -117,8 +120,6 @@
                     TextInput:
                         id: jobaddr
                         text: ''
-                        color: 'black'
-                        readonly: True
                 Button:
                     id: SaveBtn
                     text: 'Save'
@@ -158,29 +159,20 @@
             BoxLayout:
                 orientation: 'vertical'
                 size_hint_x: 0.6
-                TextInput:
+                Label:
                     id: nickname
-                    text: 'Hello'
-                BoxLayout:
-                    Label:
-                        text: 'Hello'
-                        color: 'black'
-                        size_hint_x: 0.2
-                    TextInput:
-                        id: mailaddr
-                        text: 'Hello'
-                        size_hint_x: 0.8
-                BoxLayout:
-                    Label:
-                        text: 'Hello'
-                        color: 'black'
-                        size_hint_x: 0.2
-                    TextInput:
-                        id: birth
-                        text: 'Hello'
-                        size_hint_x: 0.8
-                Button:
-                    text: 'Change!'
+                    text: 'Please input nickname'
+                    color: 'black'
+                Label:
+                    id: mailaddr
+                    text: 'Mail address : '
+                    color: 'black'
+                    size_hint_x: 0.2
+                Label:
+                    id: birth
+                    text: 'Birth date : '
+                    color: 'black'
+                    size_hint_x: 0.2
         BoxLayout:
             size_hint_y: 0.7
             ScreenManager:

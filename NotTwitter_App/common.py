@@ -34,7 +34,6 @@ class AlertPopup(Popup):
 
 # Yes랑 No중에 선택하는 팝업창
 class SelectPopup(Popup):
-    result = False
     def __init__(self, title, content, yesText, noText, yesFunc=None, noFunc=None, **kwargs):
         super().__init__(**kwargs)
 
@@ -42,29 +41,26 @@ class SelectPopup(Popup):
         self.ids.content.text = content
 
         self.ids.yesBtn.text = yesText
-        self.ids.yesBtn.on_release = self.func_template(yesFunc)
+        self.ids.yesBtn.on_release = self.on_release(yesFunc if callable(yesFunc) else lambda : None)
 
         self.ids.noBtn.text = noText
-        self.ids.noBtn.text = self.func_template(noFunc)
-    def func_template(self, func):
-        def foo():
-            func()
-            self.dismiss()
-        return foo
+        self.ids.noBtn.on_release = self.on_release(noFunc if callable(noFunc) else lambda : None)
+    def on_release(self, func):
+        def template(): func(); self.dismiss();
+        return template
 
 # 입력값을 입력하는 팝업창
 class InsertPopup(Popup):
-    _value = None
-    _textInput = TextInput()
-    def __init__(self, title, **kwargs):
+    def __init__(self, title, content, callback, is_secret=False, **kwargs):
         super().__init__(**kwargs)
 
-        contentLayout = BoxLayout(orientation='vertical')
-        contentLayout.add_widget(self._textInput)
-        contentLayout.add_widget(Button(text='Input!', on_release=self._setValue))
-
-        self.title=title
-        self.content=contentLayout
+        self.title = title
+        self.ids.content.text = content
+        self.ids.the_input.password = is_secret
+        self.ids.the_button.on_release = self.on_release(callback)
+    def on_release(self, func):
+        def template(): func(self.ids.the_input.text); self.dismiss();
+        return template
 
 # 지금까지 찾아다닌 게시글들의 id들의 이력들을 저장하는 클래스
 class SearchLog:

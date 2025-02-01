@@ -2,7 +2,7 @@ from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.screenmanager import Screen
 
-from profile_screen import profilescreen
+from profile_screen import profilescreen, profilewhom
 from db_interface import ResponseException, usersdbinterface
 from folder_paths import GUI_folder, graphics_folder
 from common import AlertPopup, SelectPopup
@@ -13,20 +13,17 @@ Builder.load_file(GUI_folder + '/login_screen_GUI.kv')
 # 로그인 입력창 클래스
 class LoginWindow(BoxLayout):
     # 입력한 문자열이 유효한지 확인한 후에 로그인을 시도한다
-    async def login(self, *args):
+    def login(self, *args):
         nickname = self.ids.nickname.text
         password = self.ids.password.text
         if nickname == "" or password == "":
             return
 
-        result = await usersdbinterface.login(nickname, password)
+        result = usersdbinterface.login(nickname, password)
         if type(result) == ResponseException:
             if result.code == 401:
-                popup = SelectPopup('First time?', 'We\'ve never seen you before.\nWould you like to sign up as a new account?', 'yes', 'no')
-                await popup.open()
-                print(popup.get_result())
-                if popup.get_result():
-                    self.register()
+                SelectPopup('First time?', 'We\'ve never seen you before.\nWould you like to sign up as a new account?', 
+                    'yes', 'no', self.register).open()
             else:
                 AlertPopup('Login error!', str(result)).open()
             return
@@ -35,9 +32,7 @@ class LoginWindow(BoxLayout):
         nickname = self.ids.nickname.text
         password = self.ids.password.text
 
-        loginscreen.goto_profile_screen()
-        profilescreen.goto_profile_detail_screen()
-        profilescreen.register_mode(nickname, password)
+        loginscreen.goto_profile_screen(nickname, password)
 loginwin = LoginWindow()
 
 # 로그인 스크린 클래스
@@ -54,6 +49,7 @@ class LoginScreen(Screen):
     def goto_post_screen(self):
         self.manager.current = "Post Screen"
     # 프로필 스크린으로 들어간다(회원가입용)
-    def goto_profile_screen(self):
+    def goto_profile_screen(self, nickname, password):
+        profilescreen.register_ready(nickname, password)
         self.manager.current = 'Profile Screen'
 loginscreen = LoginScreen(name="Login Screen")

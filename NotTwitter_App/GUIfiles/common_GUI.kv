@@ -51,15 +51,18 @@
         BoxLayout:
             Button:
                 id: yesBtn
-                on_release: root.set_result(True)
             Button:
                 id: noBtn
-                on_release: root.set_result(False)
 
 <InsertPopup>
     size_hint: 1, 0.2
     auto_dismiss: True
     BoxLayout:
         orientation: 'vertical'
+        Label:
+            id: content
         TextInput:
-            
+            id: the_input
+        Button:
+            id: the_button
+            text: 'Input'
