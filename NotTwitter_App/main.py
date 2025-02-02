@@ -17,7 +17,7 @@ from menu_screen import menuscreen
 
 
 Window.clearcolor = (1, 1, 1, 1)
-Window.size = (350, 750)
+# Window.size = (350, 750)
 
 class NotTwitterApp(App):
     screen_manager = ScreenManager()

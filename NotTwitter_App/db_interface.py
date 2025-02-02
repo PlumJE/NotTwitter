@@ -12,7 +12,7 @@ class ResponseException(RequestException):
 
 # 서버와의 인터페이스 베이스 클래스
 class DBInterface:
-    _url = 'http://127.0.0.1:8000/'
+    _url = 'http://172.30.1.60:8000/'
     # http 통신을 실행하는 함수. json()결과물이나 REsponseException()을 리턴만 하고, 예외를 발생시키지 않는다.
     def __execute(self, method, url, headers, data):
         try:
