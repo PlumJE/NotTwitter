@@ -2,9 +2,8 @@ from logging import Logger, FileHandler, DEBUG
 from kivy.lang import Builder
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
-from kivy.uix.button import Button
+from kivy.uix.image import AsyncImage
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.textinput import TextInput
 from kivy.uix.behaviors import ButtonBehavior
 
 from folder_paths import GUI_folder
@@ -15,13 +14,32 @@ Builder.load_file(GUI_folder + '/common_GUI.kv')
 # 게시글 유닛 클래스
 class PostUnit(ButtonBehavior, BoxLayout):
     # 게시글에 게시글id, 작성자id, 작성날짜, 내용, 클릭시 행동을 입력해 게시글 유닛을 생성한다
-    def __init__(self, id, writer, writedate, content, action, **kwargs):
+    def __init__(self, id, writer, writedate, content, action, profileimg=None, postimg=None, **kwargs):
         super(PostUnit, self).__init__(**kwargs)
+
         self._id = id
-        self.ids.writer.text += writer
-        self.ids.writedate.text += writedate
+        self.ids.writer.text = 'Writer : ' + writer if writer is not None else ''
+        self.ids.writedate.text = 'Write date : ' + writedate if writedate is not None else ''
         self.ids.content.text = content
         self.on_release = action
+        if profileimg:
+            self.ids.profile_layout.add_widget(profileimg)
+        if postimg:
+            self.ids.postimg_layout.add_widget(postimg)
+        
+
+# 클릭 가능한 사진 클래스
+class ClickableImg(ButtonBehavior, AsyncImage):
+    def __init__(self, path, action=None, **kwargs):
+        super(ClickableImg, self).__init__(**kwargs)
+        if path is not None:
+            self.source = 'http://127.0.0.1:8000/media/' + path
+
+        if action:
+            self.on_release = action
+    def change_image(self, path):
+        if path is not None:
+            self.source = 'http://127.0.0.1:8000/media/' + path
 
 # Alert 메시지를 보내는 팝업창
 class AlertPopup(Popup):
@@ -41,13 +59,16 @@ class SelectPopup(Popup):
         self.ids.content.text = content
 
         self.ids.yesBtn.text = yesText
-        self.ids.yesBtn.on_release = self.on_release(yesFunc if callable(yesFunc) else lambda : None)
+        self.yesFunc = yesFunc
 
         self.ids.noBtn.text = noText
-        self.ids.noBtn.on_release = self.on_release(noFunc if callable(noFunc) else lambda : None)
-    def on_release(self, func):
-        def template(): func(); self.dismiss();
-        return template
+        self.noFunc = noFunc
+    def select(self, yes):
+        if yes and self.yesFunc:
+            self.yesFunc()
+        elif not yes and self.noFunc:
+            self.noFunc()
+        self.dismiss();
 
 # 입력값을 입력하는 팝업창
 class InsertPopup(Popup):
@@ -56,11 +77,25 @@ class InsertPopup(Popup):
 
         self.title = title
         self.ids.content.text = content
-        self.ids.the_input.password = is_secret
-        self.ids.the_button.on_release = self.on_release(callback)
-    def on_release(self, func):
-        def template(): func(self.ids.the_input.text); self.dismiss();
-        return template
+
+        self.callback = callback
+        self.ids.text_input.password = is_secret
+    def insert(self):
+        if self.callback:
+            self.callback(self.ids.text_input.text)
+            self.dismiss()
+
+# 파일 선택 팝업창
+class FileChooserPopup(Popup):
+    def __init__(self, title, callback, **kwargs):
+        super().__init__(**kwargs)
+
+        self.title = title
+        self.callback = callback
+    def load_file(self):
+        if self.callback and self.ids.filechooser.selection:
+            self.callback(self.ids.filechooser.selection)
+            self.dismiss()
 
 # 지금까지 찾아다닌 게시글들의 id들의 이력들을 저장하는 클래스
 class SearchLog:

@@ -1,20 +1,13 @@
 from kivy.lang import Builder
-from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.screenmanager import Screen
-from kivy.uix.behaviors import ButtonBehavior
 
 from profile_screen import profilewhom
-from db_interface import ResponseException, usersdbinterface, postsdbinterface
+from db_interface import usersdbinterface, userdetaildbinterface, postsdbinterface
 from folder_paths import GUI_folder, graphics_folder
-from common import PostUnit, AlertPopup, redirection, searchlog
+from common import PostUnit, ClickableImg, redirection, searchlog
 
 
 Builder.load_file(GUI_folder + '/post_screen_GUI.kv')
-
-# 프로필로 가는 버튼 레이아웃 클래스
-class ButtonLayout(ButtonBehavior, BoxLayout):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
 
 # 게시글 스크린 클래스
 class PostScreen(Screen):
@@ -24,21 +17,29 @@ class PostScreen(Screen):
     order = 'id'
     # 게시글 스크린으로 들어가기 직전의 행동이다
     def on_pre_enter(self, *args):
+        # 유저 이름을 불러온다
         userinfo = usersdbinterface.get_userinfo()
-        if type(userinfo) == ResponseException:
-            AlertPopup('Post loading error!', str(userinfo)).open()
-            self.goto_login_screen()
+        if userinfo is None:
             return
         nickname = userinfo.get('nickname')
         self.ids.welcome_message.text = 'Welcome, ' + nickname + '!'
+        
+        profileimg = ClickableImg(
+            userdetaildbinterface.download_profile(),
+            lambda : self.goto_profile_screen(), 
+            size_hint=(0.9, 0.9)
+        )
+
+        self.ids.pfimg_layout.clear_widgets()
+        self.ids.pfimg_layout.add_widget(profileimg)
+
         # 리다이렉션이 있으면 리다이렉트 하고 없으면 모든 부모가 ''인 것을 보여준다
         self.updateposts(redirection.get_redirection())
         redirection.set_redirection(None)
     # 부모가 되는 게시글과 그것의 자식 게시글들을 소환한다
     def updateposts(self, id_prefix=None, where='', order=''):
         self.ids.body.clear_widgets()
-        # 초기화 과정
-        # if self.ids.body.children != []:
+
         # id_prefix에 값이 전달되지 않으면 기존값을 유지하고, 값이 전달되면 값을 바꾼다.
         if id_prefix == None:
             id_prefix = postsdbinterface.get_id_prefix()
@@ -60,26 +61,45 @@ class PostScreen(Screen):
         
         # 부모와 자식 게시들을의 id를 소환해, 이들을 통해 화면에 게시글들을 표시한다
         postlist = postsdbinterface.get_postlist(where, order)
-        if type(postlist) == ResponseException:
-            AlertPopup('Post loading error!', str(postlist)).open()
+        if postlist is None:
             return
+        
         for post in postlist:
             result = postsdbinterface.get_post(post)
-            if type(result) == ResponseException:
-                AlertPopup('Post loading error!', str(result)).open()
+            if result is None:
                 return
+
             id = result.get('id')
-            writer = result.get('writer')
-            userinfo = usersdbinterface.get_userinfo(writer)
-            if type(userinfo) == ResponseException:
-                AlertPopup('Post loading error!', str(userinfo)).open()
+            writernum = result.get('writer')
+            userinfo = usersdbinterface.get_userinfo(writernum)
+            if userinfo is None:
                 return
+
             writer = userinfo.get('nickname')
             writedate = result.get('writedate')
             content = result.get('content')
             action = lambda id=id : self.updateposts(id)
-            self.ids.body.add_widget(PostUnit(id, writer, writedate, content, action))
-        
+
+            profile_url = userdetaildbinterface.download_profile(writernum)
+            if profile_url:
+                profileimg = ClickableImg(
+                    profile_url,
+                    lambda writernum=writernum : self.goto_profile_screen(writernum),
+                    size_hint=(0.9, 0.9)
+                )
+            else:
+                profileimg = None
+            
+            postimg_url = postsdbinterface.download_postimg(id)
+            if postimg_url:
+                postimg = ClickableImg(
+                    postimg_url,
+                    lambda : None
+                )
+            else:
+                postimg = None
+
+            self.ids.body.add_widget(PostUnit(id, writer, writedate, content, action, profileimg, postimg))
         # 로그에 값을 저장한다
         if id_prefix != '':
             searchlog.add(id_prefix)

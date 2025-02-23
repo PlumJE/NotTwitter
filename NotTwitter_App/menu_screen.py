@@ -1,5 +1,5 @@
 from kivy.lang import Builder
-from kivy.uix.screenmanager import Screen, ScreenManager
+from kivy.uix.screenmanager import Screen
 
 from db_interface import usersdbinterface
 from folder_paths import GUI_folder, graphics_folder

@@ -1,7 +1,7 @@
 """
 작성자 : 외기러기
 작성시작일 : 2024-03-05
-버전 정보 : 0.2.4 at 2025-02-01
+버전 정보 : 1.0.0 at 2025-02-23
 내가 만든 이 코드를 당신 또는 다른사람이 먼저 만들었다고 거짓말하지 마세요!!
 """
 
@@ -17,7 +17,7 @@ from menu_screen import menuscreen
 
 
 Window.clearcolor = (1, 1, 1, 1)
-# Window.size = (350, 750)
+Window.size = (350, 750)
 
 class NotTwitterApp(App):
     screen_manager = ScreenManager()

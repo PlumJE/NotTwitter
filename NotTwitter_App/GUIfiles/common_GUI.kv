@@ -1,6 +1,7 @@
 <PostUnit>
     height: self.minimum_height
     size_hint_y: None
+    padding: dp(10)
     orientation: 'vertical'
     on_release: None
     canvas:
@@ -13,6 +14,7 @@
         height: dp(40)
         size_hint_y: None
         padding: dp(10)
+        spacing: dp(5)
         Label:
             id: writer
             text: 'Writer : '
@@ -20,29 +22,41 @@
             text_size: self.size
             halign: 'left'
             valign: 'middle'
-        Label:
-            id: writedate
-            text: 'Write date : '
-            color: 'black'
-            text_size: self.size
-            halign: 'left'
-            valign: 'middle'
+        BoxLayout:
+            id: profile_layout
+            size_hint_x: None
+    Label:
+        id: writedate
+        text: 'Write date : '
+        color: 'black'
+        text_size: self.size
+        halign: 'left'
+        valign: 'middle'
     Label:
         id: content
         color: 'black'
         height: self.texture_size[1]
         size_hint_y: None
-        padding: dp(20)
+        padding: dp(10)
         text_size: self.width, None
         halign: 'left'
-        valign: 'middle'
+        valign: 'top'
+    BoxLayout
+        id: postimg_layout
+        size_hint_y: None
+        height: dp(150) if self.children else 0
+
+<ClickableImg>
+    size_hint_x: 1
+    keep_ratio: True
+    allow_stretch: True
 
 <AlertPopup>:
-    size_hint: 1, 0.2
+    size_hint_y: 0.2
     auto_dismiss: True
 
 <SelectPopup>
-    size_hint: 1, 0.2
+    size_hint_y: 0.2
     auto_dismiss: True
     BoxLayout:
         orientation: 'vertical'
@@ -51,18 +65,32 @@
         BoxLayout:
             Button:
                 id: yesBtn
+                on_release: root.select(yes=True)
             Button:
                 id: noBtn
+                on_release: root.select(yes=False)
 
 <InsertPopup>
-    size_hint: 1, 0.2
+    size_hint_y: 0.2
     auto_dismiss: True
     BoxLayout:
         orientation: 'vertical'
         Label:
             id: content
         TextInput:
-            id: the_input
+            id: text_input
         Button:
-            id: the_button
             text: 'Input'
+            on_release: root.insert()
+
+<FileChooserPopup>
+    size_hint_y: 0.5
+    auto_dismiss: True
+    BoxLayout:
+        orientation: 'vertical'
+        FileChooserListView:
+            id: filechooser
+        Button:
+            text: 'Select'
+            size_hint_y: 0.2
+            on_release: root.load_file()

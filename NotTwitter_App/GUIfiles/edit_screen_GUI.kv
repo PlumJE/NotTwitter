@@ -19,8 +19,11 @@
             size_hint_y: 0.8
             do_scroll_x: False
             do_scroll_y: True
-            TextInput:
-                id: content
+            BoxLayout:
+                id: body
+                orientation: 'vertical'
+                TextInput:
+                    id: content
         BoxLayout:
             size_hint_y: 0.1
             Button:

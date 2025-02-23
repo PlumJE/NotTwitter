@@ -1,5 +1,3 @@
-#: import InsertPopup common.InsertPopup
-
 <ProfileRecentScreen>:
     ScrollView:
         size_hint_y: 0.85
@@ -28,11 +26,7 @@
                     Rectangle:
                         pos: self.pos
                         size: self.size
-                Label:
-                    text: 'Essential'
-                    color: 'black'
                 BoxLayout:
-                    id: nicknamelayout
                     Label:
                         text: 'Nickname : '
                         color: 'black'
@@ -50,9 +44,6 @@
                         color: 'black'
                     TextInput:
                         id: birth
-                Label:
-                    text: 'Optional'
-                    color: 'black'
                 BoxLayout:
                     Label:
                         text: 'First name : '
@@ -66,7 +57,6 @@
                     TextInput:
                         id: lastname
                 BoxLayout:
-                    id: firstloginlayout
                     Label:
                         text: 'First Login : '
                         color: 'black'
@@ -74,7 +64,6 @@
                         id: firstlogin
                         color: 'black'
                 BoxLayout:
-                    id: lastloginlayout
                     Label:
                         text: 'Last Login : '
                         color: 'black'
@@ -82,7 +71,6 @@
                         id: lastlogin
                         color: 'black'
                 BoxLayout:
-                    id: phonelayout
                     Label:
                         text: 'Phone number : '
                         color: 'black'
@@ -121,9 +109,9 @@
                         id: jobaddr
                         text: ''
                 Button:
-                    id: SaveBtn
-                    text: 'Save'
-                    on_release: root.save_profile()
+                    id: changeBtn
+                    text: 'Change'
+                    on_release: root.change_profile()
 
 <ProfileScreen>:
     Image:
@@ -146,33 +134,31 @@
                     width: 1.5
                     rectangle: self.x, self.y, self.width, self.height
             BoxLayout:
-                orientation: 'vertical'
+                id: pfimg_layout
                 size_hint_x: 0.4
-                Image:
-                    size_hint_y: 0.8
-                Button:
-                    size_hint: None, None
-                    size_x: self.text_size
-                    size_y: self.text_size
-                    pos_hint_x: 0.5
-                    text: 'Change'
             BoxLayout:
                 orientation: 'vertical'
                 size_hint_x: 0.6
                 Label:
                     id: nickname
                     text: 'Please input nickname'
+                    font_size: sp(20)
+                    bold: True
                     color: 'black'
                 Label:
                     id: mailaddr
                     text: 'Mail address : '
+                    text_size: self.size
+                    halign: 'left'
+                    valign: 'middle'
                     color: 'black'
-                    size_hint_x: 0.2
                 Label:
                     id: birth
                     text: 'Birth date : '
+                    text_size: self.size
+                    halign: 'left'
+                    valign: 'middle'
                     color: 'black'
-                    size_hint_x: 0.2
         BoxLayout:
             size_hint_y: 0.7
             ScreenManager:

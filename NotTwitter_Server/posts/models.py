@@ -6,6 +6,7 @@ class Posts(models.Model):
     writer = models.TextField(default='', blank=True)
     writedate = models.TextField(default='', blank=True)
     content = models.TextField(default='', blank=True)
+    postimg = models.ImageField(upload_to='images/postimgs/', default='', blank=True)
 
     class Meta:
         managed = True

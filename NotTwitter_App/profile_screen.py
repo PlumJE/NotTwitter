@@ -3,7 +3,7 @@ from kivy.uix.screenmanager import Screen
 
 from db_interface import ResponseException, userdetaildbinterface, usersdbinterface, postsdbinterface
 from folder_paths import GUI_folder, graphics_folder
-from common import PostUnit, redirection, AlertPopup, InsertPopup
+from common import PostUnit, ClickableImg, redirection, AlertPopup, InsertPopup, FileChooserPopup
 
 
 Builder.load_file(GUI_folder + '/profile_screen_GUI.kv')
@@ -39,6 +39,12 @@ class ProfileRecentScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.on_pre_enter()
+        # 부모 스크린이 나타나기 직전 같이 실행될 행동
+    def on_parent_enter(self):
+        self.on_pre_enter()
+    # 부모 스크린이 사라진 직후 같이 실행될 행동
+    def on_parent_leave(self):
+        pass
     # 스크린이 나타나기 직전 행동
     def on_pre_enter(self, *args):
         self.ids.recentlist.clear_widgets()
@@ -53,26 +59,49 @@ class ProfileRecentScreen(Screen):
 
         # 유저 번호에 해당하는 유저의 게시글만 가져온다
         postlist = postsdbinterface.get_postlist(where, order)
-        if type(postlist) == ResponseException:
-            AlertPopup('Post loading error!', str(postlist)).open()
+        if postlist is None:
             return
         
+        if len(postlist) == 0:
+            self.ids.recentlist.add_widget(PostUnit('', None, None, 'There\'s no recent activities.', None))
+            return
+
         for post in postlist:
             result = postsdbinterface.get_post(post)
-            if type(result) == ResponseException:
-                AlertPopup('Adjust error!', str(result)).open()
+            if result is None:
                 return
+
             id = result.get('id')
-            writer = result.get('writer')
-            userinfo = usersdbinterface.get_userinfo(writer)
-            if type(userinfo) == ResponseException:
-                AlertPopup('Adjust error!', str(userinfo)).open()
+            writernum = result.get('writer')
+            userinfo = usersdbinterface.get_userinfo(writernum)
+            if userinfo is None:
                 return
+
             writer = userinfo.get('nickname')
             writedate = result.get('writedate')
             content = result.get('content')
             action = lambda id=id : self.redirect(id)
-            self.ids.recentlist.add_widget(PostUnit(id, writer, writedate, content, action))
+
+            profile_url = userdetaildbinterface.download_profile(writernum)
+            if profile_url:
+                profileimg = ClickableImg(
+                    profile_url,
+                    lambda : None,
+                    size_hint=(0.9, 0.9)
+                )
+            else:
+                profileimg = None
+            
+            postimg_url = postsdbinterface.download_postimg(id)
+            if postimg_url:
+                postimg = ClickableImg(
+                    postimg_url,
+                    lambda : None
+                )
+            else:
+                postimg = None
+
+            self.ids.recentlist.add_widget(PostUnit(id, writer, writedate, content, action, profileimg, postimg))
     # 리다이렉션한다
     def redirect(self, id):
         redirection.set_redirection(id)
@@ -83,39 +112,48 @@ profilerecentscreen = ProfileRecentScreen(name='Profile Recent Screen')
 class ProfileDetailScreen(Screen):
     # 부모 스크린이 나타나기 직전 같이 실행될 행동
     def on_parent_enter(self):
-        if not usersdbinterface.is_login():
-            self.hide_widget(self.ids.firstloginlayout)
-            self.hide_widget(self.ids.lastloginlayout)
+        # profilewhom의 usernum이 None이 아니면, Change버튼을 숨긴다다.
+        if profilewhom.get_usernum is not None:
+            self.showhide_changeBtn(show=False)
+            self.readonly_profiles(readonly=True)
         self.load_profile()
     # 부모 스크린이 사라진 직후 같이 실행될 행동
     def on_parent_leave(self):
-        self.show_widget(self.ids.firstloginlayout)
-        self.show_widget(self.ids.lastloginlayout)
+        self.showhide_changeBtn(show=True)
+        self.readonly_profiles(readonly=False)
     # 스크린이 나타나기 직전 행동
     def on_pre_enter(self, *args):
         self.load_profile()
     # 스크린이 사라진 직후 행동
     def on_leave(self, *args):
         self.clean_profile()
-    # 위젯을 숨긴다
-    def hide_widget(self, widget):
-        widget.size_hint = (None, None)
-        widget.size = (0, 0)
-        widget.opacity = 0
-        widget.disabled = True
-    # 위젯을 보여준다
-    def show_widget(self, widget):
-        widget.size_hint = self.ids.phonelayout.size_hint
-        widget.size = self.ids.phonelayout.size
-        widget.opacity = 1
-        widget.disabled = False
+    # Change버튼을 숨기거나 드러낸다
+    def showhide_changeBtn(self, show):
+        self.changeBtn_size_hint = self.ids.changeBtn.size_hint
+        self.changeBtn_size = self.ids.changeBtn.size
+        self.ids.changeBtn.size_hint = self.changeBtn_size_hint if show else (None, None)
+        self.ids.changeBtn.size = self.changeBtn_size if show else (0, 0)
+        self.ids.changeBtn.opacity = 1 if show else 0
+        self.ids.changeBtn.disabled = False if show else True
+    # 프로필들 readonly설정을 on/off한다
+    def readonly_profiles(self, readonly):
+        self.ids.nickname.readonly = True if readonly else False
+        self.ids.mailaddr.readonly = True if readonly else False
+        self.ids.birth.readonly = True if readonly else False
+        self.ids.firstname.readonly = True if readonly else False
+        self.ids.lastname.readonly = True if readonly else False
+        self.ids.phone.readonly = True if readonly else False
+        self.ids.families.readonly = True if readonly else False
+        self.ids.nation.readonly = True if readonly else False
+        self.ids.legion.readonly = True if readonly else False
+        self.ids.job.readonly = True if readonly else False
+        self.ids.jobaddr.readonly = True if readonly else False
     # DB에서 프로필을 불러온다
     def load_profile(self):
-        if not usersdbinterface.is_login():
-            self.ids.nickname.text = profilewhom.get_nickname()
-            return
-
+        # profilewhom의 usernum이 None이면, 자신의 유저번호를 가져온다.
         usernum = profilewhom.get_usernum()
+        if usernum is None:
+            usernum = usersdbinterface.usernum
 
         userinfo = usersdbinterface.get_userinfo(usernum)
         if type(userinfo) == ResponseException:
@@ -125,10 +163,7 @@ class ProfileDetailScreen(Screen):
             return
         
         userdetail = userdetaildbinterface.get_userdetail(usernum)
-        if type(userdetail) == ResponseException:
-            if userinfo.code != 401:
-                AlertPopup('Load Error!', str(userdetail)).open()
-                profilescreen.goto_post_screen()
+        if userdetail is None:
             return
         
         self.ids.nickname.text = userinfo.get('nickname')
@@ -145,8 +180,15 @@ class ProfileDetailScreen(Screen):
         self.ids.legion.text = userdetail.get('legion')
         self.ids.job.text = userdetail.get('job')
         self.ids.jobaddr.text = userdetail.get('jobaddr')
+
+        self.former_nickname = self.ids.nickname.text
+        self.former_mailaddr = self.ids.mailaddr.text
+
+        profilescreen.ids.nickname.text = self.ids.nickname.text
+        profilescreen.ids.mailaddr.text = 'Mail address : \n' + self.ids.mailaddr.text
+        profilescreen.ids.birth.text = 'Birth Date : \n' + self.ids.birth.text
     # DB에 변경한 프로필을 저장하기 전 행동이다
-    def save_profile(self):
+    def change_profile(self):
         nickname = self.ids.nickname.text
         mailaddr = self.ids.mailaddr.text
         birth = self.ids.birth.text
@@ -171,50 +213,22 @@ class ProfileDetailScreen(Screen):
         job = self.ids.job.text
         jobaddr = self.ids.jobaddr.text
 
-        if not usersdbinterface.is_login():
-            if profilewhom.get_password() != password:
-                AlertPopup('Register error!', 'Please insert right password').open()
-                return
-            
-            result = usersdbinterface.post_userinfo(nickname, password, mailaddr, firstname, lastname)
-            if type(result) == ResponseException:
-                AlertPopup('Register error!', str(result)).open()
-                return
-            
-            result = usersdbinterface.login(nickname, password)
-            if type(result) == ResponseException:
-                AlertPopup('Register error!', str(result)).open()
-                return
-            
-            result = userdetaildbinterface.post_userdetail(birth, phone, families, nation, legion, job, jobaddr)
-            if type(result) == ResponseException:
-                AlertPopup('Register error!', str(result)).open()
-                usersdbinterface.logout()
-                return
-            
-            profilewhom.clear_all()
-            AlertPopup('Register Complete!', 'Welcome and Enjoy my App~').open()
-        else:
-            result = usersdbinterface.login(nickname, password)
-            if type(result) == ResponseException:
-                AlertPopup('Update error!', 'Please insert right password').open()
-                return
+        result = usersdbinterface.login(self.former_nickname, self.former_mailaddr, password)
+        if result is None:
+            return
 
-            result = usersdbinterface.put_userinfo(nickname, mailaddr, firstname, lastname)
-            if type(result) == ResponseException:
-                AlertPopup('Update error!', str(result)).open()
-                return
-            
-            result = userdetaildbinterface.put_userdetail(birth, phone, families, nation, legion, job, jobaddr)
-            if type(result) == ResponseException:
-                AlertPopup('Update error!', str(result)).open()
-                usersdbinterface.logout()
-                return
-            
-            AlertPopup('', 'Profile Save Complete!').open()
+        result = usersdbinterface.put_userinfo(nickname, mailaddr, firstname, lastname)
+        if result is None:
+            return
+        
+        result = userdetaildbinterface.put_userdetail(birth, phone, families, nation, legion, job, jobaddr)
+        if result is None:
+            return
+        
+        AlertPopup('', 'Profile Change Complete!').open()
         self.load_profile()
         profilescreen.update_profile()
-    # 프로필 리스트를 초기화시킨다다
+    # 프로필 리스트를 초기화시킨다
     def clean_profile(self):
         self.ids.nickname.text = ''
         self.ids.mailaddr.text = ''
@@ -239,49 +253,46 @@ class ProfileScreen(Screen):
         super().__init__(**kwargs)
         self.ids.body.add_widget(profilerecentscreen)
         self.ids.body.add_widget(profiledetailscreen)
+        self.filechooser = FileChooserPopup('Select Image', self.update_pfimg)
     # 들어올 때 행동
     def on_pre_enter(self, *args):
+        profilerecentscreen.on_parent_enter()
         profiledetailscreen.on_parent_enter()
+        self.update_profile()
     # 떠날 때 행동
     def on_leave(self, *args):
-        self.goto_profile_recent_screen()
+        profilerecentscreen.on_parent_leave()
         profiledetailscreen.on_parent_leave()
+        self.goto_profile_recent_screen()
     # 헤더를 업데이트 한다
     def update_profile(self):
-        userinfo = usersdbinterface.get_userinfo()
-        if type(userinfo) == ResponseException:
-            if userinfo.code != 401:
-                AlertPopup('Load Error!', str(userinfo)).open()
-                profilescreen.goto_post_screen()
-            return
+        usernum = profilewhom.get_usernum()
         
-        userdetail = userdetaildbinterface.get_userdetail()
-        if type(userdetail) == ResponseException:
-            if userinfo.code != 401:
-                AlertPopup('Load Error!', str(userdetail)).open()
-                profilescreen.goto_post_screen()
-            return
-        
-        self.ids.nickname.text = userinfo.get('nickname')
-        self.ids.mailaddr.text = 'Mail address : ' + userinfo.get('mailaddr')
-        self.ids.birth.text = 'Birth date : ' + userdetail.get('birth')
-    # 회원가입을 준비한다
-    def register_ready(self, nickname, password):
-        profilewhom.set_nickname_password(nickname, password)
-        self.ids.body.current = 'Profile Detail Screen'
+        profileimg = ClickableImg(
+            userdetaildbinterface.download_profile(usernum),
+            lambda : self.filechooser.open(),
+            size_hint=(0.9, 0.9)
+        )
+
+        self.ids.pfimg_layout.clear_widgets()
+        self.ids.pfimg_layout.add_widget(profileimg)
+    # 프로필 사진을 업데이트한다
+    def update_pfimg(self, paths):
+        userdetaildbinterface.upload_profile(paths[0])
+        self.update_profile()
     # 최근 활동 스크린을 불러온다
     def goto_profile_recent_screen(self):
-        if not usersdbinterface.is_login():
+        if not usersdbinterface.usernum:
             return
         self.ids.body.current = 'Profile Recent Screen'
     # 프로필 상세보기 및 편집 스크린을 불러온다
     def goto_profile_detail_screen(self):
-        if not usersdbinterface.is_login():
+        if not usersdbinterface.usernum:
             return
         self.ids.body.current = 'Profile Detail Screen'
-    # 게시글 스크린으로 간다다
+    # 게시글 스크린으로 간다
     def goto_post_screen(self):
-        if not usersdbinterface.is_login():
+        if not usersdbinterface.usernum:
             return
         self.manager.current = 'Post Screen'
 profilescreen = ProfileScreen(name='Profile Screen')

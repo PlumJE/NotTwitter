@@ -9,7 +9,7 @@
             pos: self.pos
             size: self.size
     GridLayout:
-        size_hint_y: 2
+        size_hint_y: 3
         cols: 2
         Label:
             text: "Nickname :"
@@ -17,6 +17,12 @@
             color: "black"
         TextInput:
             id: nickname
+        Label:
+            text: "Mail address :"
+            width: 100
+            color: "black"
+        TextInput:
+            id: mailaddr
         Label:
             text: "Password :"
             width: 100
@@ -32,7 +38,6 @@
 
 <LoginScreen>
     Image:
-        id: loginbg
         fit_mode: "fill"
         source: root.bg_path
         on_touch_up: root.openLoginWin()
@@ -43,7 +48,7 @@
         Label:
             size: 100, 30
             size_hint: None, None
-            text: 'ver 0.2.4'
+            text: 'ver 1.0.0'
             color: 'black'
     AnchorLayout:
         id: loginlayout
